@@ -1,0 +1,160 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(~{::section}, 'Nueva Orden de Compra')}">
+<body>
+<section>
+  <h4 class="fw-bold mb-4">Nueva orden de compra</h4>
+
+  <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
+  <form th:action="@{/ordenes-compra/guardar}" th:object="${orden}" method="post" id="formOrden">
+
+    <div class="card mb-4">
+      <h5 class="card-header">Datos de la compra</h5>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Proveedor</label>
+            <select class="form-select" th:field="*{proveedorId}"
+                    th:classappend="${#fields.hasErrors('proveedorId')} ? 'is-invalid'">
+              <option value="">Seleccione...</option>
+              <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.razonSocial}"></option>
+            </select>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('proveedorId')}" th:errors="*{proveedorId}"></div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Fecha</label>
+            <input type="date" class="form-control" th:field="*{fecha}"
+                   th:classappend="${#fields.hasErrors('fecha')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></div>
+          </div>
+          <div class="col-md-5 mb-3">
+            <label class="form-label">Observaciones</label>
+            <input type="text" class="form-control" th:field="*{observaciones}" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Detalle de productos comprados</h5>
+        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAgregarFila">
+          <i class="bx bx-plus"></i> Agregar producto
+        </button>
+      </div>
+      <div class="card-body">
+        <div th:if="${#fields.hasErrors('detalles')}" class="alert alert-warning" th:errors="*{detalles}"></div>
+
+        <div class="table-responsive">
+          <table class="table" id="tablaDetalle">
+            <thead>
+            <tr>
+              <th style="min-width:260px;">Producto</th>
+              <th style="width:120px;">Cantidad</th>
+              <th style="width:160px;">Precio unitario</th>
+              <th style="width:160px;">Subtotal</th>
+              <th style="width:60px;"></th>
+            </tr>
+            </thead>
+            <tbody id="cuerpoDetalle">
+            <!-- Filas dinámicas -->
+            </tbody>
+            <tfoot>
+            <tr>
+              <td colspan="3" class="text-end fw-bold">Total:</td>
+              <td class="fw-bold" id="totalOrden">$ 0.00</td>
+              <td></td>
+            </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Registrar orden de compra</button>
+    <a th:href="@{/ordenes-compra}" class="btn btn-outline-secondary">Cancelar</a>
+  </form>
+
+  <!-- Template adentro de <section> para que el layout lo incluya -->
+  <template id="filaTemplate">
+    <tr>
+      <td>
+        <select class="form-select select-producto">
+          <option value="">Seleccione un producto...</option>
+          <option th:each="p : ${productos}"
+                  th:value="${p.id}"
+                  th:text="${p.codigo + ' - ' + p.nombre}"
+                  th:attr="data-precio=${p.precioCompra}"></option>
+        </select>
+      </td>
+      <td><input type="number" min="1" step="1" class="form-control input-cantidad" value="1" /></td>
+      <td><input type="number" min="0.01" step="0.01" class="form-control input-precio" /></td>
+      <td class="celda-subtotal">$ 0.00</td>
+      <td><button type="button" class="btn btn-icon btn-outline-danger btn-quitar-fila"><i class="bx bx-trash"></i></button></td>
+    </tr>
+  </template>
+
+  <!-- Script adentro de <section> para que viaje dentro del fragmento -->
+  <script>
+    (function () {
+      const cuerpo = document.getElementById('cuerpoDetalle');
+      const plantilla = document.getElementById('filaTemplate');
+      const totalOrdenEl = document.getElementById('totalOrden');
+      const btnAgregar = document.getElementById('btnAgregarFila');
+
+      if (!cuerpo || !plantilla || !btnAgregar) return;
+
+      function reindexarFilas() {
+        const filas = cuerpo.querySelectorAll('tr');
+        filas.forEach((fila, index) => {
+          fila.querySelector('.select-producto').name = 'detalles[' + index + '].productoId';
+          fila.querySelector('.input-cantidad').name = 'detalles[' + index + '].cantidad';
+          fila.querySelector('.input-precio').name = 'detalles[' + index + '].precioUnitario';
+        });
+      }
+
+      function recalcularTotales() {
+        let total = 0;
+        cuerpo.querySelectorAll('tr').forEach((fila) => {
+          const cantidad = parseFloat(fila.querySelector('.input-cantidad').value) || 0;
+          const precio = parseFloat(fila.querySelector('.input-precio').value) || 0;
+          const subtotal = cantidad * precio;
+          fila.querySelector('.celda-subtotal').textContent = '$ ' + subtotal.toFixed(2);
+          total += subtotal;
+        });
+        totalOrdenEl.textContent = '$ ' + total.toFixed(2);
+      }
+
+      function agregarFila() {
+        const nodo = plantilla.content.cloneNode(true);
+        const fila = nodo.querySelector('tr');
+
+        fila.querySelector('.select-producto').addEventListener('change', function () {
+          const opcionSeleccionada = this.options[this.selectedIndex];
+          const precioSugerido = opcionSeleccionada.getAttribute('data-precio');
+          const inputPrecio = fila.querySelector('.input-precio');
+          if (precioSugerido && !inputPrecio.value) {
+            inputPrecio.value = parseFloat(precioSugerido).toFixed(2);
+          }
+          recalcularTotales();
+        });
+
+        fila.querySelector('.input-cantidad').addEventListener('input', recalcularTotales);
+        fila.querySelector('.input-precio').addEventListener('input', recalcularTotales);
+        fila.querySelector('.btn-quitar-fila').addEventListener('click', function () {
+          fila.remove();
+          reindexarFilas();
+          recalcularTotales();
+        });
+
+        cuerpo.appendChild(fila);
+        reindexarFilas();
+      }
+
+      btnAgregar.addEventListener('click', agregarFila);
+      agregarFila();
+    })();
+  </script>
+</section>
+</body>
+</html>

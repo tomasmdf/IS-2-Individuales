@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout(titulo='Panel principal', activo='dashboard', content=~{::main})}">
+<main>
+    <p class="text-muted mb-4">
+        Bienvenido/a, <strong sec:authentication="name"></strong>.
+    </p>
+
+    <div class="row g-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small">Alumnos</span>
+                        <h3 class="mb-0" th:text="${cantidadAlumnos}">0</h3>
+                    </div>
+                    <i class="bx bx-group bx-lg text-primary"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small">Docentes</span>
+                        <h3 class="mb-0" th:text="${cantidadDocentes}">0</h3>
+                    </div>
+                    <i class="bx bx-chalkboard bx-lg text-success"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small">Grados</span>
+                        <h3 class="mb-0" th:text="${cantidadGrados}">0</h3>
+                    </div>
+                    <i class="bx bx-layer bx-lg text-warning"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small">Materias</span>
+                        <h3 class="mb-0" th:text="${cantidadMaterias}">0</h3>
+                    </div>
+                    <i class="bx bx-book-content bx-lg text-info"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1" sec:authorize="hasRole('DOCENTE')">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Accesos rápidos</h5>
+                    <a th:href="@{/notas}" class="btn btn-primary me-2"><i class="bx bx-notepad me-1"></i>Cargar notas</a>
+                    <a th:href="@{/cuenta/cambiar-password}" class="btn btn-outline-secondary"><i class="bx bx-key me-1"></i>Cambiar mi contraseña</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</html>

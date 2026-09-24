@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Alumnos', activo='alumnos', content=~{::main})}">
+<main>
+    <h4 class="fw-bold mb-4">
+        <span class="text-muted fw-light">Alumnos /</span> <span th:text="${alumno.nombreCompleto()}">Apellido, Nombre</span>
+    </h4>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card"><div class="card-body">
+                <h5 class="card-title">Datos personales</h5>
+                <dl class="row mb-0">
+                    <dt class="col-5 text-muted">DNI</dt><dd class="col-7" th:text="${alumno.dni}">-</dd>
+                    <dt class="col-5 text-muted">Sexo</dt><dd class="col-7" th:text="${alumno.sexo}">-</dd>
+                    <dt class="col-5 text-muted">Nacimiento</dt>
+                    <dd class="col-7" th:text="${#temporals.format(alumno.fechaNacimiento, 'dd/MM/yyyy')}">-</dd>
+                    <dt class="col-5 text-muted">Grado</dt><dd class="col-7" th:text="${alumno.nombreGrado}">-</dd>
+                    <dt class="col-5 text-muted">Aula</dt><dd class="col-7" th:text="${alumno.nombreAula}">-</dd>
+                </dl>
+            </div></div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card"><div class="card-body">
+                <h5 class="card-title">Notas</h5>
+                <table class="table">
+                    <thead><tr><th>Materia</th><th>Docente</th><th>Período</th><th>Nota</th></tr></thead>
+                    <tbody>
+                    <tr th:each="n : ${notas}">
+                        <td th:text="${n.nombreMateria}">Matemática</td>
+                        <td th:text="${n.nombreDocente}">-</td>
+                        <td th:text="${n.periodo}">-</td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${n.valor >= 7} ? 'badge-nota-alta' : (${n.valor >= 4} ? 'badge-nota-media' : 'badge-nota-baja')"
+                                  th:text="${n.valor}">-</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(notas)}"><td colspan="4" class="text-center text-muted py-3">Sin notas cargadas todavía.</td></tr>
+                    </tbody>
+                </table>
+            </div></div>
+        </div>
+    </div>
+</main>
+</html>

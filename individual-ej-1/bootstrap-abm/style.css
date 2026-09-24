@@ -1,0 +1,23 @@
+label:has(+ input[required])::after  {
+    content: " *";
+    color: red;
+}
+
+#readData .modal-body label {
+    color: #131313;
+}
+
+#readData .modal-body input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #ced4da;
+    outline: none;
+    border-radius: 0;
+    color: #ced4da;
+}
+
+#readData .modal-body .img-holder {
+    height: 200px;
+    width: 200px;
+    margin: 0 auto;
+}

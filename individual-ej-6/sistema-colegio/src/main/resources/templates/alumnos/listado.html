@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout(titulo='Alumnos', activo='alumnos', content=~{::main})}">
+<main>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0"><span class="text-muted fw-light">Académico /</span> Alumnos</h4>
+        <a th:href="@{/alumnos/nuevo}" class="btn btn-primary" sec:authorize="hasRole('ADMIN')">
+            <i class="bx bx-user-plus me-1"></i>Registrar alumno
+        </a>
+    </div>
+    <div class="card">
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead><tr><th>Alumno</th><th>DNI</th><th>Grado</th><th>Aula</th><th>Acciones</th></tr></thead>
+                <tbody class="table-border-bottom-0">
+                <tr th:each="a : ${alumnos}">
+                    <td><a th:href="@{/alumnos/{id}(id=${a.id})}" th:text="${a.nombreCompleto()}">Apellido, Nombre</a></td>
+                    <td th:text="${a.dni}">-</td>
+                    <td th:text="${a.nombreGrado}">1er Año</td>
+                    <td th:text="${a.nombreAula}">A</td>
+                    <td sec:authorize="hasRole('ADMIN')">
+                        <a th:href="@{/alumnos/{id}/editar(id=${a.id})}" class="btn btn-sm p-1"><i class="bx bx-edit-alt"></i></a>
+                        <form th:action="@{/alumnos/{id}/eliminar(id=${a.id})}" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar este alumno?');">
+                            <button type="submit" class="btn btn-sm p-1"><i class="bx bx-trash text-danger"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(alumnos)}"><td colspan="5" class="text-center text-muted py-4">Sin alumnos cargados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</html>

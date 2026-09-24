@@ -1,0 +1,51 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(~{::section}, 'Ordenes de Compra')}">
+<body>
+<section>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Ordenes de compra</h4>
+    <a th:href="@{/ordenes-compra/nueva}" class="btn btn-primary"><i class="bx bx-plus"></i> Nueva orden de compra</a>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive text-nowrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Numero</th>
+            <th>Fecha</th>
+            <th>Proveedor</th>
+            <th>Usuario</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="o : ${ordenes}">
+            <td th:text="${o.numero}"></td>
+            <td th:text="${#temporals.format(o.fecha, 'dd/MM/yyyy')}"></td>
+            <td th:text="${o.proveedorNombre}"></td>
+            <td th:text="${o.usuarioNombre}"></td>
+            <td>
+              <span class="badge"
+                    th:classappend="${o.estado.name() == 'PENDIENTE'} ? 'bg-label-warning' : (${o.estado.name() == 'RECIBIDA'} ? 'bg-label-success' : 'bg-label-secondary')"
+                    th:text="${o.estado}"></span>
+            </td>
+            <td th:text="${'$ ' + #numbers.formatDecimal(o.total, 1, 'POINT', 2, 'COMMA')}"></td>
+            <td>
+              <a th:href="@{'/ordenes-compra/' + ${o.id}}" class="btn btn-sm btn-icon btn-outline-primary">
+                <i class="bx bx-show"></i>
+              </a>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(ordenes)}">
+            <td colspan="7" class="text-center text-muted">No hay ordenes de compra registradas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</body>
+</html>

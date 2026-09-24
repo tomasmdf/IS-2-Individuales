@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Aulas', activo='aulas', content=~{::main})}">
+<main>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0"><span class="text-muted fw-light">Académico /</span> Aulas</h4>
+        <a th:href="@{/aulas/nuevo}" class="btn btn-primary"><i class="bx bx-plus me-1"></i>Nueva aula</a>
+    </div>
+    <div class="card">
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead><tr><th>Grado</th><th>División</th><th>Capacidad</th><th>Alumnos</th><th>Acciones</th></tr></thead>
+                <tbody class="table-border-bottom-0">
+                <tr th:each="a : ${aulas}">
+                    <td th:text="${a.nombreGrado}">1er Año</td>
+                    <td th:text="${a.division}">A</td>
+                    <td th:text="${a.capacidad}">30</td>
+                    <td><span class="badge bg-label-primary" th:text="${a.cantidadAlumnos}">0</span></td>
+                    <td>
+                        <a th:href="@{/aulas/{id}/editar(id=${a.id})}" class="btn btn-sm p-1"><i class="bx bx-edit-alt"></i></a>
+                        <form th:action="@{/aulas/{id}/eliminar(id=${a.id})}" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar esta aula?');">
+                            <button type="submit" class="btn btn-sm p-1"><i class="bx bx-trash text-danger"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(aulas)}"><td colspan="5" class="text-center text-muted py-4">Sin aulas cargadas.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</html>

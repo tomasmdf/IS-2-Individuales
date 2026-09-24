@@ -1,0 +1,59 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(~{::section}, 'Productos')}">
+<body>
+<section>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Productos</h4>
+    <a th:href="@{/productos/nuevo}" class="btn btn-primary"><i class="bx bx-plus"></i> Nuevo producto</a>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive text-nowrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Codigo</th>
+            <th>Nombre</th>
+            <th>Categoria</th>
+            <th>Precio compra</th>
+            <th>Precio venta</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="p : ${productos}">
+            <td th:text="${p.codigo}"></td>
+            <td th:text="${p.nombre}"></td>
+            <td th:text="${p.categoriaNombre}"></td>
+            <td th:text="${'$ ' + #numbers.formatDecimal(p.precioCompra, 1, 'POINT', 2, 'COMMA')}"></td>
+            <td th:text="${'$ ' + #numbers.formatDecimal(p.precioVenta, 1, 'POINT', 2, 'COMMA')}"></td>
+            <td>
+              <span class="badge" th:classappend="${p.stock <= p.stockMinimo} ? 'bg-label-danger' : 'bg-label-success'"
+                    th:text="${p.stock}"></span>
+            </td>
+            <td>
+              <span class="badge" th:classappend="${p.activo} ? 'bg-label-success' : 'bg-label-secondary'"
+                    th:text="${p.activo} ? 'Activo' : 'Inactivo'"></span>
+            </td>
+            <td>
+              <a th:href="@{'/productos/' + ${p.id} + '/editar'}" class="btn btn-sm btn-icon btn-outline-primary me-1">
+                <i class="bx bx-edit"></i>
+              </a>
+              <form th:action="@{'/productos/' + ${p.id} + '/eliminar'}" method="post" class="d-inline"
+                    onsubmit="return confirm('¿Dar de baja este producto?');">
+                <button type="submit" class="btn btn-sm btn-icon btn-outline-danger"><i class="bx bx-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(productos)}">
+            <td colspan="8" class="text-center text-muted">No hay productos cargados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</body>
+</html>

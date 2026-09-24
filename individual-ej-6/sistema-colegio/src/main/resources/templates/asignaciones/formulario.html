@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Asignaciones', activo='asignaciones', content=~{::main})}">
+<main>
+    <h4 class="fw-bold mb-4"><span class="text-muted fw-light">Asignaciones /</span> Nueva asignación</h4>
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card"><div class="card-body">
+                <form th:action="@{/asignaciones/guardar}" th:object="${asignacionRequest}" method="post">
+                    <input type="hidden" th:field="*{id}"/>
+                    <div class="mb-3">
+                        <label class="form-label" for="docenteId">Docente</label>
+                        <select id="docenteId" class="form-select" th:field="*{docenteId}"
+                                th:classappend="${#fields.hasErrors('docenteId')} ? 'is-invalid'">
+                            <option value="">Seleccionar...</option>
+                            <option th:each="d : ${docentes}" th:value="${d.id}" th:text="${d.nombreCompleto()}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{docenteId}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="materiaId">Materia</label>
+                        <select id="materiaId" class="form-select" th:field="*{materiaId}"
+                                th:classappend="${#fields.hasErrors('materiaId')} ? 'is-invalid'">
+                            <option value="">Seleccionar...</option>
+                            <option th:each="m : ${materias}" th:value="${m.id}" th:text="${m.nombre}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{materiaId}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="aulaId">Aula</label>
+                        <select id="aulaId" class="form-select" th:field="*{aulaId}"
+                                th:classappend="${#fields.hasErrors('aulaId')} ? 'is-invalid'">
+                            <option value="">Seleccionar...</option>
+                            <option th:each="a : ${aulas}" th:value="${a.id}" th:text="${a.etiqueta()}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{aulaId}"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a th:href="@{/asignaciones}" class="btn btn-outline-secondary">Cancelar</a>
+                </form>
+            </div></div>
+        </div>
+    </div>
+</main>
+</html>

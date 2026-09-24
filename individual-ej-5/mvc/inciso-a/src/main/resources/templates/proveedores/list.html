@@ -1,0 +1,52 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(~{::section}, 'Proveedores')}">
+<body>
+<section>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Proveedores</h4>
+    <a th:href="@{/proveedores/nuevo}" class="btn btn-primary"><i class="bx bx-plus"></i> Nuevo proveedor</a>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive text-nowrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Razon social</th>
+            <th>CUIT</th>
+            <th>Telefono</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="p : ${proveedores}">
+            <td th:text="${p.razonSocial}"></td>
+            <td th:text="${p.cuit}"></td>
+            <td th:text="${p.telefono}"></td>
+            <td th:text="${p.email}"></td>
+            <td>
+              <span class="badge" th:classappend="${p.activo} ? 'bg-label-success' : 'bg-label-secondary'"
+                    th:text="${p.activo} ? 'Activo' : 'Inactivo'"></span>
+            </td>
+            <td>
+              <a th:href="@{'/proveedores/' + ${p.id} + '/editar'}" class="btn btn-sm btn-icon btn-outline-primary me-1">
+                <i class="bx bx-edit"></i>
+              </a>
+              <form th:action="@{'/proveedores/' + ${p.id} + '/eliminar'}" method="post" class="d-inline"
+                    onsubmit="return confirm('¿Dar de baja este proveedor?');">
+                <button type="submit" class="btn btn-sm btn-icon btn-outline-danger"><i class="bx bx-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(proveedores)}">
+            <td colspan="6" class="text-center text-muted">No hay proveedores cargados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# Levanta una base MySQL 8 lista para usar con la aplicación:
+#   docker compose up -d
+# Credenciales por defecto (coinciden con application.properties):
+#   usuario: root  /  contraseña: root  /  base: colegio_db
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: colegio-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: colegio_db
+      TZ: America/Argentina/Mendoza
+    ports:
+      - "3306:3306"
+    volumes:
+      - colegio_mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  # Servidor SMTP de pruebas: captura los correos sin enviarlos de verdad.
+  # Bandeja web: http://localhost:8025   (SMTP en localhost:1025)
+  # Usar con:  MAIL_HOST=localhost MAIL_PORT=1025 MAIL_SMTP_AUTH=false MAIL_STARTTLS=false
+  mailpit:
+    image: axllent/mailpit
+    container_name: colegio-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  colegio_mysql_data:

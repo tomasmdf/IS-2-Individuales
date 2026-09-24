@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Alumnos', activo='alumnos', content=~{::main})}">
+<main>
+    <h4 class="fw-bold mb-4">
+        <span class="text-muted fw-light">Alumnos /</span>
+        <span th:text="${alumnoRequest.id == null} ? 'Registrar alumno' : 'Editar alumno'">Formulario</span>
+    </h4>
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card"><div class="card-body">
+                <form th:action="@{/alumnos/guardar}" th:object="${alumnoRequest}" method="post">
+                    <input type="hidden" th:field="*{id}"/>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="nombre">Nombre</label>
+                            <input type="text" id="nombre" class="form-control" th:field="*{nombre}"
+                                   th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid'"/>
+                            <div class="invalid-feedback" th:errors="*{nombre}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="apellido">Apellido</label>
+                            <input type="text" id="apellido" class="form-control" th:field="*{apellido}"
+                                   th:classappend="${#fields.hasErrors('apellido')} ? 'is-invalid'"/>
+                            <div class="invalid-feedback" th:errors="*{apellido}"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="dni">DNI</label>
+                            <input type="text" id="dni" class="form-control" th:field="*{dni}"
+                                   th:classappend="${#fields.hasErrors('dni')} ? 'is-invalid'"/>
+                            <div class="invalid-feedback" th:errors="*{dni}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="sexo">Sexo</label>
+                            <select id="sexo" class="form-select" th:field="*{sexo}"
+                                    th:classappend="${#fields.hasErrors('sexo')} ? 'is-invalid'">
+                                <option value="">Seleccionar...</option>
+                                <option th:each="s : ${sexos}" th:value="${s}" th:text="${s}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:errors="*{sexo}"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="fechaNacimiento">Fecha de nacimiento</label>
+                            <input type="date" id="fechaNacimiento" class="form-control" th:field="*{fechaNacimiento}"
+                                   th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'is-invalid'"/>
+                            <div class="invalid-feedback" th:errors="*{fechaNacimiento}"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="gradoId">Grado</label>
+                            <select id="gradoId" class="form-select" th:field="*{gradoId}"
+                                    th:classappend="${#fields.hasErrors('gradoId')} ? 'is-invalid'">
+                                <option value="">Seleccionar...</option>
+                                <option th:each="g : ${grados}" th:value="${g.id}" th:text="${g.nombre}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:errors="*{gradoId}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="aulaId">Aula</label>
+                            <select id="aulaId" class="form-select" th:field="*{aulaId}"
+                                    th:classappend="${#fields.hasErrors('aulaId')} ? 'is-invalid'">
+                                <option value="">Seleccionar...</option>
+                                <option th:each="a : ${aulas}" th:value="${a.id}" th:text="${a.etiqueta()}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:errors="*{aulaId}"></div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a th:href="@{/alumnos}" class="btn btn-outline-secondary">Cancelar</a>
+                </form>
+            </div></div>
+        </div>
+    </div>
+</main>
+</html>

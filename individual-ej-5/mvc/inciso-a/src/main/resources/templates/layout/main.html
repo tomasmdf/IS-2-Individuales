@@ -1,0 +1,169 @@
+<div th:fragment="layout(content, titulo)" xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <!DOCTYPE html>
+  <html lang="es" class="light-style layout-menu-fixed" data-theme="theme-default" data-assets-path="/assets/"
+        xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${titulo} + ' - Sistema de Compras'">Sistema de Compras</title>
+
+    <link rel="icon" type="image/x-icon" th:href="@{/assets/img/favicon/favicon.ico}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+    <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" />
+    <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+    <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+
+    <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+    <script th:src="@{/assets/js/config.js}"></script>
+  </head>
+  <body>
+  <div class="layout-wrapper layout-content-navbar">
+    <div class="layout-container">
+
+      <!-- ===================== Menu lateral (sidebar) ===================== -->
+      <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+        <div class="app-brand demo">
+          <a th:href="@{/dashboard}" class="app-brand-link">
+            <span class="app-brand-logo demo"><i class='bx bx-chip text-primary' style="font-size: 2rem;"></i></span>
+            <span class="app-brand-text demo menu-text fw-bolder ms-2">CompraStock</span>
+          </a>
+          <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+            <i class="bx bx-chevron-left bx-sm align-middle"></i>
+          </a>
+        </div>
+
+        <div class="menu-inner-shadow"></div>
+
+        <ul class="menu-inner py-1">
+          <li class="menu-item" th:classappend="${currentUri != null and currentUri == '/dashboard' ? 'active' : ''}">
+            <a th:href="@{/dashboard}" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-home-circle"></i>
+              <div>Dashboard</div>
+            </a>
+          </li>
+
+          <li class="menu-header small text-uppercase"><span class="menu-header-text">Catalogo</span></li>
+          <li class="menu-item" th:classappend="${currentUri != null and currentUri.startsWith('/productos') ? 'active' : ''}">
+            <a th:href="@{/productos}" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-devices"></i>
+              <div>Productos</div>
+            </a>
+          </li>
+          <li class="menu-item" th:classappend="${currentUri != null and currentUri.startsWith('/categorias') ? 'active' : ''}">
+            <a th:href="@{/categorias}" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-category"></i>
+              <div>Categorias</div>
+            </a>
+          </li>
+          <li class="menu-item" th:classappend="${currentUri != null and currentUri.startsWith('/proveedores') ? 'active' : ''}">
+            <a th:href="@{/proveedores}" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-buildings"></i>
+              <div>Proveedores</div>
+            </a>
+          </li>
+
+          <li class="menu-header small text-uppercase"><span class="menu-header-text">Compras</span></li>
+          <li class="menu-item" th:classappend="${currentUri != null and currentUri.startsWith('/ordenes-compra') ? 'active' : ''}">
+            <a th:href="@{/ordenes-compra}" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-cart"></i>
+              <div>Ordenes de Compra</div>
+            </a>
+          </li>
+
+          <li class="menu-item" sec:authorize="hasRole('ADMIN')"
+              th:classappend="${currentUri != null and currentUri.startsWith('/usuarios') ? 'active' : ''}">
+            <a th:href="@{/usuarios}" class="menu-link">
+              <i class="menu-icon tf-icons bx bx-user"></i>
+              <div>Usuarios</div>
+            </a>
+          </li>
+        </ul>
+      </aside>
+      <!-- ===================== Fin menu lateral ===================== -->
+
+      <div class="layout-page">
+
+        <!-- ===================== Navbar superior ===================== -->
+        <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+          <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+            <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+              <i class="bx bx-menu bx-sm"></i>
+            </a>
+          </div>
+
+          <div class="navbar-nav-right d-flex align-items-center ms-auto" id="navbar-collapse">
+            <ul class="navbar-nav flex-row align-items-center ms-auto">
+              <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                  <div class="avatar avatar-online">
+                  <span class="avatar-initial rounded-circle bg-label-primary">
+                    <i class='bx bx-user'></i>
+                  </span>
+                  </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="javascript:void(0);">
+                      <span class="fw-semibold d-block" th:text="${usuarioLogueado}">usuario</span>
+                    </a>
+                  </li>
+                  <li><div class="dropdown-divider"></div></li>
+                  <li>
+                    <form th:action="@{/logout}" method="post">
+                      <button type="submit" class="dropdown-item">
+                        <i class="bx bx-power-off me-1"></i> Cerrar sesion
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        <!-- ===================== Fin navbar ===================== -->
+
+        <div class="content-wrapper">
+          <div class="container-xxl flex-grow-1 container-p-y">
+
+            <!-- Mensajes flash (exito / error), comunes a todas las vistas -->
+            <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible" role="alert">
+              <span th:text="${mensajeExito}"></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible" role="alert">
+              <span th:text="${mensajeError}"></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- ============ CONTENIDO PROPIO DE CADA VISTA (parametro 'content') ============ -->
+            <div th:replace="${content}">Contenido</div>
+
+          </div>
+          <!-- Footer -->
+          <footer class="content-footer footer bg-footer-theme">
+            <div class="container-xxl d-flex flex-wrap justify-content-between py-2">
+              <div>Sistema de Gestion de Compras &copy; <span th:text="${#dates.year(#dates.createNow())}"></span></div>
+              <div>Plantilla: Sneat</div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+  <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+  <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+  <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+  <script th:src="@{/assets/vendor/js/menu.js}"></script>
+  <script th:src="@{/assets/js/main.js}"></script>
+  </body>
+  </html>
+</div>

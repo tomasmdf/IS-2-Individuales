@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Asignaciones', activo='asignaciones', content=~{::main})}">
+<main>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0"><span class="text-muted fw-light">Académico /</span> Asignaciones (carga horaria)</h4>
+        <a th:href="@{/asignaciones/nuevo}" class="btn btn-primary"><i class="bx bx-plus me-1"></i>Nueva asignación</a>
+    </div>
+    <div class="card">
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead><tr><th>Docente</th><th>Materia</th><th>Aula</th><th>Acciones</th></tr></thead>
+                <tbody class="table-border-bottom-0">
+                <tr th:each="a : ${asignaciones}">
+                    <td th:text="${a.nombreDocente}">Apellido, Nombre</td>
+                    <td th:text="${a.nombreMateria}">Matemática</td>
+                    <td th:text="${a.etiquetaAula}">1er Año "A"</td>
+                    <td>
+                        <form th:action="@{/asignaciones/{id}/eliminar(id=${a.id})}" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar esta asignación?');">
+                            <button type="submit" class="btn btn-sm p-1"><i class="bx bx-trash text-danger"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(asignaciones)}"><td colspan="4" class="text-center text-muted py-4">Sin asignaciones cargadas.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</html>
