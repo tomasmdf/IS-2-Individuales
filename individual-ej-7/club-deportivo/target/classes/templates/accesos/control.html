@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::content})}">
+
+<th:block th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold py-1 mb-0">
+                <span class="text-muted fw-light">Control Perimetral /</span> Terminal de Accesos y Cotejo Facial
+            </h4>
+            <p class="text-muted mb-0">
+                Registro de horario de entrada y salida con validación visual de la fotografía del rostro y estado de cuota familiar
+            </p>
+        </div>
+        <div>
+            <a th:href="@{/accesos/historial}" class="btn btn-outline-primary">
+                <i class="bx bx-history me-1"></i> Ver Historial Completo
+            </a>
+        </div>
+    </div>
+
+    <!-- Indicadores Rápidos del Puesto de Control -->
+    <div class="row mb-4">
+        <div class="col-md-4 col-sm-6 mb-2">
+            <div class="card card-border-shadow-primary h-100">
+                <div class="card-body py-3 d-flex align-items-center">
+                    <div class="avatar me-3">
+                        <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-buildings fs-4"></i></span>
+                    </div>
+                    <div>
+                        <small class="text-muted text-uppercase fw-semibold">Dentro del Club</small>
+                        <h4 class="mb-0 fw-bold" th:text="${dentroHoy}">0</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 mb-2">
+            <div class="card card-border-shadow-success h-100">
+                <div class="card-body py-3 d-flex align-items-center">
+                    <div class="avatar me-3">
+                        <span class="avatar-initial rounded bg-label-success"><i class="bx bx-log-in fs-4"></i></span>
+                    </div>
+                    <div>
+                        <small class="text-muted text-uppercase fw-semibold">Ingresos Hoy</small>
+                        <h4 class="mb-0 fw-bold text-success" th:text="${entradasHoy}">0</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 mb-2">
+            <div class="card card-border-shadow-warning h-100">
+                <div class="card-body py-3 d-flex align-items-center">
+                    <div class="avatar me-3">
+                        <span class="avatar-initial rounded bg-label-warning"><i class="bx bx-log-out fs-4"></i></span>
+                    </div>
+                    <div>
+                        <small class="text-muted text-uppercase fw-semibold">Egresos Hoy</small>
+                        <h4 class="mb-0 fw-bold text-warning" th:text="${salidasHoy}">0</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Columna Izquierda: Escaneo y Verificación Biométrica -->
+        <div class="col-xl-6 col-lg-6 mb-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title text-white mb-0 d-flex align-items-center">
+                        <i class="bx bx-barcode-reader me-2 fs-4"></i> Escaneo de DNI en Molinete
+                    </h5>
+                </div>
+                <div class="card-body pt-4">
+                    <div class="input-group input-group-lg mb-3">
+                        <span class="input-group-text"><i class="bx bx-id-card"></i></span>
+                        <input type="text"
+                               id="inputDni"
+                               class="form-control"
+                               placeholder="Ingrese o escanee el DNI..."
+                               autofocus
+                               autocomplete="off" />
+                        <button type="button" class="btn btn-primary" onclick="consultarPersona()">
+                            <i class="bx bx-search-alt me-1"></i> Verificar
+                        </button>
+                    </div>
+
+                    <!-- Mensaje de Alerta AJAX -->
+                    <div id="alertaBusqueda" class="alert d-none" role="alert"></div>
+
+                    <!-- Panel de Cotejo Facial y Situación Financiera -->
+                    <div id="panelPersona" class="border rounded p-4 bg-light d-none">
+                        <div class="row align-items-center">
+                            <!-- Fotografía Facial Proyectada -->
+                            <div class="col-md-5 text-center mb-3 mb-md-0">
+                                <img id="personaFoto"
+                                     src="/assets/img/avatars/1.png"
+                                     alt="Fotografía Facial"
+                                     class="avatar-facial-control mb-2"
+                                     onerror="this.src='/assets/img/avatars/1.png';" />
+                                <div class="small text-muted fw-semibold">Fotografía Registrada</div>
+                            </div>
+
+                            <!-- Información de la Persona y Estado de la Cuota -->
+                            <div class="col-md-7">
+                                <h4 id="personaNombre" class="fw-bold mb-1 text-primary">Nombre y Apellido</h4>
+                                <div class="mb-2">
+                                    <span id="personaDni" class="badge bg-label-dark me-1">DNI: 00000000</span>
+                                    <span id="personaRol" class="badge bg-label-info">Socio Titular</span>
+                                </div>
+                                <p id="personaSocioTitularContenedor" class="small text-muted mb-2 d-none">
+                                    Socio Titular: <strong id="personaSocioTitular"></strong>
+                                </p>
+
+                                <!-- Situación de la Cuota Familiar -->
+                                <div class="mb-3">
+                                    <div class="small fw-semibold text-muted mb-1">Estado de la Cuota Social:</div>
+                                    <span id="personaBadgeCuota" class="badge p-2 fs-6">Al Día</span>
+                                </div>
+
+                                <!-- Mensaje de Presencia -->
+                                <div class="mb-3">
+                                    <span id="personaPresencia" class="badge bg-label-secondary">Fuera del Club</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- Mensaje de Validación de Accesos Consecutivos (Anti-Passback) -->
+                        <div id="avisoDobleAcceso" class="alert py-2 mb-3 text-center d-none"></div>
+
+                        <!-- Formulario de Confirmación de Entrada / Salida -->
+                        <form th:action="@{/accesos/registrar}" method="post" id="formRegistroAcceso">
+                            <input type="hidden" name="dniPersona" id="formDniPersona" />
+                            <input type="hidden" name="tipoAcceso" id="formTipoAcceso" />
+                            <input type="hidden" name="puntoAcceso" value="Molinete Principal #1" />
+
+                            <div class="d-flex gap-3 justify-content-center pt-2">
+                                <button type="button"
+                                        id="btnEntrada"
+                                        class="btn btn-success btn-lg px-4"
+                                        onclick="ejecutarAcceso('ENTRADA')">
+                                    <i class="bx bx-log-in me-1"></i> Registrar ENTRADA
+                                </button>
+                                <button type="button"
+                                        id="btnSalida"
+                                        class="btn btn-warning btn-lg px-4"
+                                        onclick="ejecutarAcceso('SALIDA')">
+                                    <i class="bx bx-log-out me-1"></i> Registrar SALIDA
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Monitor de Movimientos en Tiempo Real -->
+        <div class="col-xl-6 col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-list-check me-1 text-primary"></i> Movimientos Registrados Hoy
+                    </h5>
+                    <span class="badge bg-label-primary">En Vivo</span>
+                </div>
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Rostro</th>
+                                <th>Persona</th>
+                                <th>Movimiento</th>
+                                <th>Horario</th>
+                                <th>Cuota</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(ultimosAccesos)}">
+                                <td colspan="5" class="text-center py-4 text-muted">Aún no hay accesos registrados hoy.</td>
+                            </tr>
+                            <tr th:each="acc : ${ultimosAccesos}">
+                                <td>
+                                    <img th:if="${acc.fotoRostro != null}"
+                                         th:src="@{'/uploads/rostros/' + ${acc.fotoRostro}}"
+                                         alt="Rostro"
+                                         class="avatar-facial"
+                                         onerror="this.src='/assets/img/avatars/1.png';" />
+                                    <img th:unless="${acc.fotoRostro != null}"
+                                         th:src="@{/assets/img/avatars/1.png}"
+                                         alt="Rostro"
+                                         class="avatar-facial" />
+                                </td>
+                                <td>
+                                    <strong th:text="${acc.nombreCompletoPersona}">Nombre</strong><br />
+                                    <small class="text-muted" th:text="${acc.dniPersona}">DNI</small>
+                                </td>
+                                <td>
+                                    <span th:if="${acc.tipoAcceso.name() == 'ENTRADA'}" class="badge bg-label-success">
+                                        <i class="bx bx-log-in me-1"></i> Entrada
+                                    </span>
+                                    <span th:if="${acc.tipoAcceso.name() == 'SALIDA'}" class="badge bg-label-warning">
+                                        <i class="bx bx-log-out me-1"></i> Salida
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(acc.fechaHora, 'HH:mm:ss')}">10:00:00</td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="'bg-label-' + ${acc.estadoCuotaMomento.colorBadge}"
+                                          th:text="${acc.estadoCuotaMomento.etiqueta}">
+                                        Al Día
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+
+    <script>
+        // Disparar búsqueda al presionar ENTER en el input
+        document.getElementById('inputDni').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                consultarPersona();
+            }
+        });
+
+        function consultarPersona() {
+            const dni = document.getElementById('inputDni').value.trim();
+            const alerta = document.getElementById('alertaBusqueda');
+            const panel = document.getElementById('panelPersona');
+
+            if (!dni) {
+                alerta.className = "alert alert-warning";
+                alerta.textContent = "Por favor, digite o escanee un número de DNI.";
+                alerta.classList.remove('d-none');
+                panel.classList.add('d-none');
+                return;
+            }
+
+            fetch(`/accesos/buscar-dni?dni=${encodeURIComponent(dni)}`)
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.error || "No se encontró a la persona.");
+                    }
+                    return data;
+                })
+                .then(persona => {
+                    alerta.classList.add('d-none');
+
+                    // Proyecta la imagen facial
+                    const fotoSrc = persona.fotoRostro ? `/uploads/rostros/${persona.fotoRostro}` : '/assets/img/avatars/1.png';
+                    document.getElementById('personaFoto').src = fotoSrc;
+
+                    // Datos personales
+                    document.getElementById('personaNombre').textContent = persona.nombreCompleto;
+                    document.getElementById('personaDni').textContent = `DNI: ${persona.dni}`;
+                    document.getElementById('personaRol').textContent = persona.rolDescripcion;
+
+                    const contTitular = document.getElementById('personaSocioTitularContenedor');
+                    if (!persona.esSocioTitular && persona.socioTitularNombre) {
+                        document.getElementById('personaSocioTitular').textContent = persona.socioTitularNombre;
+                        contTitular.classList.remove('d-none');
+                    } else {
+                        contTitular.classList.add('d-none');
+                    }
+
+                    // Estado financiero de cuota
+                    const badgeCuota = document.getElementById('personaBadgeCuota');
+                    if (persona.estadoCuota === 'AL_DIA') {
+                        badgeCuota.className = "badge bg-label-success p-2 fs-6";
+                        badgeCuota.innerHTML = "<i class='bx bx-check-circle me-1'></i> Cuota al Día (Habilitado)";
+                    } else if (persona.estadoCuota === 'ADEUDA') {
+                        badgeCuota.className = "badge bg-label-warning p-2 fs-6";
+                        badgeCuota.innerHTML = "<i class='bx bx-error-circle me-1'></i> Adeuda Cuota Mes Actual";
+                    } else {
+                        badgeCuota.className = "badge bg-label-danger p-2 fs-6";
+                        badgeCuota.innerHTML = "<i class='bx bx-x-circle me-1'></i> Cuotas Vencidas / Regularizar";
+                    }
+
+                    // Presencia actual y control de accesos consecutivos (Anti-Passback)
+                    const presencia = document.getElementById('personaPresencia');
+                    const aviso = document.getElementById('avisoDobleAcceso');
+                    const btnEntrada = document.getElementById('btnEntrada');
+                    const btnSalida = document.getElementById('btnSalida');
+
+                    if (persona.actualmenteAdentro) {
+                        presencia.className = "badge bg-label-success";
+                        presencia.textContent = "Actualmente DENTRO de las instalaciones";
+
+                        aviso.className = "alert alert-warning py-2 mb-3 text-start";
+                        aviso.innerHTML = "<i class='bx bx-error-circle me-1'></i> <strong>Atención:</strong> La persona ya se encuentra <strong>DENTRO</strong> del club. No puede ingresar 2 veces consecutivas sin haber salido. Debe registrar una <strong>SALIDA</strong>.";
+                        aviso.classList.remove('d-none');
+
+                        // Deshabilita la entrada para prevenir doble ingreso
+                        btnEntrada.disabled = true;
+                        btnEntrada.classList.add('opacity-50', 'disabled');
+                        btnEntrada.classList.remove('shadow');
+
+                        // Habilita la salida
+                        btnSalida.disabled = false;
+                        btnSalida.classList.remove('opacity-50', 'disabled');
+                        btnSalida.classList.add('shadow');
+                    } else {
+                        presencia.className = "badge bg-label-secondary";
+                        presencia.textContent = "Actualmente FUERA del club";
+
+                        aviso.className = "alert alert-info py-2 mb-3 text-start";
+                        aviso.innerHTML = "<i class='bx bx-check-shield me-1'></i> La persona se encuentra <strong>FUERA</strong> del club. Lista para registrar su ingreso.";
+                        aviso.classList.remove('d-none');
+
+                        // Habilita la entrada
+                        btnEntrada.disabled = false;
+                        btnEntrada.classList.remove('opacity-50', 'disabled');
+                        btnEntrada.classList.add('shadow');
+
+                        // Deshabilita la salida para prevenir egreso sin ingreso previo
+                        btnSalida.disabled = true;
+                        btnSalida.classList.add('opacity-50', 'disabled');
+                        btnSalida.classList.remove('shadow');
+                    }
+
+                    // Prepara el formulario de registro
+                    document.getElementById('formDniPersona').value = persona.dni;
+                    panel.classList.remove('d-none');
+                })
+                .catch(err => {
+                    panel.classList.add('d-none');
+                    alerta.className = "alert alert-danger";
+                    alerta.innerHTML = `<i class='bx bx-error-circle me-1'></i> ${err.message}`;
+                    alerta.classList.remove('d-none');
+                });
+        }
+
+        function ejecutarAcceso(tipo) {
+            const btn = (tipo === 'ENTRADA') ? document.getElementById('btnEntrada') : document.getElementById('btnSalida');
+            if (btn && btn.disabled) {
+                return;
+            }
+            document.getElementById('formTipoAcceso').value = tipo;
+            document.getElementById('formRegistroAcceso').submit();
+        }
+    </script>
+</th:block>
+</html>

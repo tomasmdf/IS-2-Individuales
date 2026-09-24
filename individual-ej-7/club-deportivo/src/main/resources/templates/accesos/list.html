@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::content})}">
+
+<th:block th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold py-1 mb-0">
+                <span class="text-muted fw-light">Control Perimetral /</span> Historial de Entradas y Salidas
+            </h4>
+            <p class="text-muted mb-0">Auditoría cronológica de accesos con fotografía facial y registro horario</p>
+        </div>
+        <div>
+            <a th:href="@{/accesos/control}" class="btn btn-primary">
+                <i class="bx bx-scan me-1"></i> Ir al Puesto de Control
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtro de Fechas -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form th:action="@{/accesos/historial}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-4 col-sm-6">
+                    <label class="form-label" for="fechaDesde">Fecha Desde</label>
+                    <input type="date" id="fechaDesde" name="fechaDesde" class="form-control" th:value="${fechaDesde}" />
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <label class="form-label" for="fechaHasta">Fecha Hasta</label>
+                    <input type="date" id="fechaHasta" name="fechaHasta" class="form-control" th:value="${fechaHasta}" />
+                </div>
+                <div class="col-md-4 col-sm-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bx bx-filter-alt me-1"></i> Filtrar Movimientos
+                    </button>
+                    <a th:href="@{/accesos/historial}" class="btn btn-outline-secondary" title="Ver accesos de hoy">
+                        <i class="bx bx-refresh"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla Histórica de Accesos -->
+    <div class="card">
+        <div class="table-responsive text-nowrap">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Rostro</th>
+                        <th>Fecha y Hora</th>
+                        <th>Movimiento</th>
+                        <th>Persona / DNI</th>
+                        <th>Condición</th>
+                        <th>Estado Cuota</th>
+                        <th>Punto de Acceso</th>
+                    </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                    <tr th:if="${#lists.isEmpty(registros)}">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bx bx-calendar-x fs-1 d-block mb-2"></i>
+                            No se registraron movimientos de acceso en el rango de fechas seleccionado.
+                        </td>
+                    </tr>
+                    <tr th:each="r : ${registros}">
+                        <td>
+                            <img th:if="${r.fotoRostro != null}"
+                                 th:src="@{'/uploads/rostros/' + ${r.fotoRostro}}"
+                                 alt="Rostro"
+                                 class="avatar-facial"
+                                 onerror="this.src='/assets/img/avatars/1.png';" />
+                            <img th:unless="${r.fotoRostro != null}"
+                                 th:src="@{/assets/img/avatars/1.png}"
+                                 alt="Rostro"
+                                 class="avatar-facial" />
+                        </td>
+                        <td>
+                            <strong th:text="${#temporals.format(r.fechaHora, 'dd/MM/yyyy')}">01/01/2026</strong>
+                            <div class="small text-muted" th:text="${#temporals.format(r.fechaHora, 'HH:mm:ss')}">10:00:00</div>
+                        </td>
+                        <td>
+                            <span th:if="${r.tipoAcceso.name() == 'ENTRADA'}" class="badge bg-label-success">
+                                <i class="bx bx-log-in me-1"></i> Entrada
+                            </span>
+                            <span th:if="${r.tipoAcceso.name() == 'SALIDA'}" class="badge bg-label-warning">
+                                <i class="bx bx-log-out me-1"></i> Salida
+                            </span>
+                        </td>
+                        <td>
+                            <strong th:text="${r.nombreCompletoPersona}">Nombre Completo</strong>
+                            <div class="small text-muted" th:text="'DNI: ' + ${r.dniPersona}">DNI: 32456789</div>
+                        </td>
+                        <td>
+                            <span th:if="${r.esSocioTitular}" class="badge bg-label-primary">Socio Titular</span>
+                            <span th:unless="${r.esSocioTitular}" class="badge bg-label-info">Familiar</span>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="'bg-label-' + ${r.estadoCuotaMomento.colorBadge}">
+                                <i class="bx me-1" th:classappend="${r.estadoCuotaMomento.icono}"></i>
+                                <span th:text="${r.estadoCuotaMomento.etiqueta}">Al Día</span>
+                            </span>
+                        </td>
+                        <td>
+                            <small class="text-muted" th:text="${r.puntoAcceso}">Molinete #1</small>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</html>

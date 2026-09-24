@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(~{::content})}">
+
+<th:block th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold py-1 mb-0">
+                <span class="text-muted fw-light">Padrón / Socios /</span> Ficha de Grupo Familiar
+            </h4>
+            <p class="text-muted mb-0">Información integral del socio titular, dependientes asociados e historial de pagos</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/socios}" class="btn btn-outline-secondary">
+                <i class="bx bx-arrow-back me-1"></i> Volver al Padrón
+            </a>
+            <a th:href="@{'/pagos/nuevo?socioId=' + ${socio.id}}" class="btn btn-success">
+                <i class="bx bx-wallet me-1"></i> Cobrar Cuota Social
+            </a>
+            <a th:href="@{'/socios/editar/' + ${socio.id}}" class="btn btn-primary">
+                <i class="bx bx-edit-alt me-1"></i> Editar Socio
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Ficha del Socio Titular -->
+        <div class="col-xl-4 col-lg-5 col-md-5 mb-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <div class="mx-auto mb-3">
+                        <img th:if="${socio.fotoRostro != null}"
+                             th:src="@{'/uploads/rostros/' + ${socio.fotoRostro}}"
+                             alt="Rostro del Socio"
+                             class="avatar-facial-lg"
+                             onerror="this.src='/assets/img/avatars/1.png';" />
+                        <img th:unless="${socio.fotoRostro != null}"
+                             th:src="@{/assets/img/avatars/1.png}"
+                             alt="Rostro del Socio"
+                             class="avatar-facial-lg" />
+                    </div>
+                    <h5 class="mb-1 fw-bold" th:text="${socio.nombreCompleto}">Nombre Titular</h5>
+                    <div class="mb-2">
+                        <span th:if="${socio.tipoSocio.name() == 'TITULAR'}" class="badge bg-label-primary">
+                            <i class="bx bx-crown me-1"></i> Socio Titular
+                        </span>
+                        <span th:if="${socio.tipoSocio.name() == 'FAMILIAR'}" class="badge bg-label-info">
+                            <i class="bx bx-group me-1"></i> Socio Familiar (<span th:text="${socio.parentescoDescripcion}">Familiar</span>)
+                        </span>
+                    </div>
+                    <span class="badge bg-label-dark mb-3" th:text="'Carnet: ' + ${socio.numeroSocio}">SOC-2026-0001</span>
+
+                    <div class="d-flex justify-content-center mb-4">
+                        <span class="badge p-2"
+                              th:classappend="'bg-label-' + ${socio.estadoCuota != null ? socio.estadoCuota.colorBadge : 'secondary'}">
+                            <i class="bx me-1" th:classappend="${socio.estadoCuota != null ? socio.estadoCuota.icono : 'bx-info-circle'}"></i>
+                            <span th:text="'Cuota Familiar: ' + ${socio.estadoCuota != null ? socio.estadoCuota.etiqueta : 'Pendiente'}">Al Día</span>
+                        </span>
+                    </div>
+
+                    <div class="border-top pt-3 text-start">
+                        <div th:if="${socio.tipoSocio.name() == 'FAMILIAR' and socio.socioTitularId != null}" class="alert alert-light border py-2 mb-3">
+                            <small class="text-muted d-block">Titular a Cargo:</small>
+                            <a th:href="@{'/socios/detalle/' + ${socio.socioTitularId}}" class="fw-bold" th:text="${socio.socioTitularNombreCompleto}">GÓMEZ, Juan</a>
+                            <div class="small text-muted" th:text="'Parentesco: ' + ${socio.parentescoDescripcion}">Cónyuge</div>
+                        </div>
+
+                        <p class="mb-2"><strong>DNI:</strong> <span th:text="${socio.dni}">32456789</span></p>
+                        <p class="mb-2"><strong>Edad:</strong> <span th:text="${socio.edad} + ' años (' + ${#temporals.format(socio.fechaNacimiento, 'dd/MM/yyyy')} + ')'">35</span></p>
+                        <p class="mb-2"><strong>Email:</strong> <span th:text="${socio.email}">email@ejemplo.com</span></p>
+                        <p class="mb-2"><strong>Teléfono:</strong> <span th:text="${socio.telefono}">+54 11 ...</span></p>
+                        <p class="mb-2"><strong>Dirección:</strong> <span th:text="${socio.direccion}">Calle 123</span></p>
+                        <p class="mb-0"><strong>Fecha Alta:</strong> <span th:text="${#temporals.format(socio.fechaAlta, 'dd/MM/yyyy')}">01/01/2026</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo Familiar y Pagos -->
+        <div class="col-xl-8 col-lg-7 col-md-7">
+
+            <!-- Sección: Socios Familiares Vinculados (Membresía Propia con Carnet) -->
+            <div th:if="${socio.tipoSocio.name() == 'TITULAR'}" class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-id-card me-1 text-primary"></i> Socios Familiares Vinculados
+                    </h5>
+                    <a th:href="@{'/socios/nuevo?titularId=' + ${socio.id}}" class="btn btn-sm btn-primary">
+                        <i class="bx bx-user-plus me-1"></i> Agregar Socio Familiar
+                    </a>
+                </div>
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Rostro</th>
+                                <th>Socio Familiar</th>
+                                <th>Carnet / DNI</th>
+                                <th>Parentesco</th>
+                                <th>Estado Cuota</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(sociosFamiliares)}">
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No hay socios familiares registrados con membresía individual dependiente de este titular.
+                                </td>
+                            </tr>
+                            <tr th:each="sfam : ${sociosFamiliares}">
+                                <td>
+                                    <img th:if="${sfam.fotoRostro != null}"
+                                         th:src="@{'/uploads/rostros/' + ${sfam.fotoRostro}}"
+                                         alt="Rostro"
+                                         class="avatar-facial"
+                                         onerror="this.src='/assets/img/avatars/1.png';" />
+                                    <img th:unless="${sfam.fotoRostro != null}"
+                                         th:src="@{/assets/img/avatars/1.png}"
+                                         alt="Rostro"
+                                         class="avatar-facial" />
+                                </td>
+                                <td>
+                                    <strong th:text="${sfam.nombreCompleto}">Nombre</strong>
+                                    <small class="d-block text-muted" th:text="${sfam.edad} + ' años'"></small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-label-dark" th:text="${sfam.numeroSocio}">SOC-2026-0002</span>
+                                    <div class="small text-muted" th:text="'DNI: ' + ${sfam.dni}">DNI: 35123456</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-label-info" th:text="${sfam.parentescoDescripcion}">Hijo/a</span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="'bg-label-' + ${sfam.estadoCuota.colorBadge}">
+                                        <i class="bx me-1" th:classappend="${sfam.estadoCuota.icono}"></i>
+                                        <span th:text="${sfam.estadoCuota.etiqueta}">Al Día</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a th:href="@{'/socios/detalle/' + ${sfam.id}}"
+                                           class="btn btn-sm btn-icon btn-outline-primary"
+                                           title="Ver Ficha">
+                                            <i class="bx bx-show"></i>
+                                        </a>
+                                        <a th:href="@{'/socios/editar/' + ${sfam.id}}"
+                                           class="btn btn-sm btn-icon btn-outline-warning"
+                                           title="Editar">
+                                            <i class="bx bx-edit-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Integrantes del Grupo Familiar (Dependientes) -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-group me-1 text-primary"></i> Dependientes del Grupo Familiar
+                    </h5>
+                    <a th:if="${socio.tipoSocio.name() == 'TITULAR'}" th:href="@{'/familiares/nuevo/' + ${socio.id}}" class="btn btn-sm btn-outline-primary">
+                        <i class="bx bx-user-plus me-1"></i> Agregar Dependiente
+                    </a>
+                </div>
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Rostro</th>
+                                <th>Nombre y Apellido</th>
+                                <th>DNI</th>
+                                <th>Parentesco</th>
+                                <th>Edad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(familiares)}">
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No hay dependientes registrados en el grupo familiar de este socio.
+                                </td>
+                            </tr>
+                            <tr th:each="fam : ${familiares}">
+                                <td>
+                                    <img th:if="${fam.fotoRostro != null}"
+                                         th:src="@{'/uploads/rostros/' + ${fam.fotoRostro}}"
+                                         alt="Rostro"
+                                         class="avatar-facial"
+                                         onerror="this.src='/assets/img/avatars/1.png';" />
+                                    <img th:unless="${fam.fotoRostro != null}"
+                                         th:src="@{/assets/img/avatars/1.png}"
+                                         alt="Rostro"
+                                         class="avatar-facial" />
+                                </td>
+                                <td>
+                                    <strong th:text="${fam.nombreCompleto}">Nombre</strong>
+                                </td>
+                                <td th:text="${fam.dni}">33987456</td>
+                                <td>
+                                    <span class="badge bg-label-info" th:text="${fam.parentescoDescripcion}">Hijo/a</span>
+                                </td>
+                                <td th:text="${fam.edad} + ' años'">10 años</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a th:href="@{'/familiares/editar/' + ${fam.id}}"
+                                           class="btn btn-sm btn-icon btn-outline-warning"
+                                           title="Editar Familiar">
+                                            <i class="bx bx-edit-alt"></i>
+                                        </a>
+                                        <form th:action="@{'/familiares/eliminar/' + ${fam.id}}"
+                                              method="post"
+                                              onsubmit="return confirm('¿Está seguro de remover a este integrante familiar?');"
+                                              class="d-inline">
+                                            <input type="hidden" name="socioId" th:value="${socio.id}" />
+                                            <button type="submit" class="btn btn-sm btn-icon btn-outline-danger" title="Dar de baja">
+                                                <i class="bx bx-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historial de Cuotas Familiares Pagadas -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-receipt me-1 text-success"></i> Historial de Cuotas del Grupo Familiar
+                    </h5>
+                    <a th:href="@{'/pagos/nuevo?socioId=' + ${socio.id}}" class="btn btn-sm btn-success">
+                        <i class="bx bx-plus me-1"></i> Nuevo Pago
+                    </a>
+                </div>
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Comprobante</th>
+                                <th>Período</th>
+                                <th>Importe</th>
+                                <th>Medio de Pago</th>
+                                <th>Fecha de Pago</th>
+                                <th>Recibo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(pagos)}">
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No se registran pagos de cuotas para este socio titular.
+                                </td>
+                            </tr>
+                            <tr th:each="pago : ${pagos}">
+                                <td>
+                                    <strong class="text-primary" th:text="${pago.numeroComprobante}">REC-001</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-label-dark" th:text="${pago.periodoFormateado}">09/2026</span>
+                                </td>
+                                <td>
+                                    <strong>$ <span th:text="${#numbers.formatDecimal(pago.monto, 1, 'POINT', 2, 'COMMA')}">15.000,00</span></strong>
+                                </td>
+                                <td>
+                                    <span class="badge" th:classappend="'bg-label-' + ${pago.medioPagoColorBadge}">
+                                        <i class="bx me-1" th:classappend="${pago.medioPagoIcono}"></i>
+                                        <span th:text="${pago.medioPagoEtiqueta}">Efectivo</span>
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(pago.fechaPago, 'dd/MM/yyyy HH:mm')}">01/09/2026 14:00</td>
+                                <td>
+                                    <a th:href="@{'/pagos/comprobante/' + ${pago.id}}"
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="Ver Recibo Oficial">
+                                        <i class="bx bx-printer"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</html>

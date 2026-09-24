@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::content})}">
+
+<th:block th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold py-1 mb-0">
+                <span class="text-muted fw-light">Tesorería /</span> Cobranza de Cuotas Familiares
+            </h4>
+            <p class="text-muted mb-0">Registro y consulta de cuotas sociales abonadas en Efectivo, Transferencia o Mercado Pago</p>
+        </div>
+        <div>
+            <a th:href="@{/pagos/nuevo}" class="btn btn-primary">
+                <i class="bx bx-plus me-1"></i> Registrar Pago de Cuota
+            </a>
+        </div>
+    </div>
+
+    <!-- Resumen de Recaudación del Mes -->
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-4 mb-2">
+            <div class="card card-border-shadow-success h-100">
+                <div class="card-body py-3 d-flex align-items-center">
+                    <div class="avatar me-3">
+                        <span class="avatar-initial rounded bg-label-success"><i class="bx bx-dollar fs-4"></i></span>
+                    </div>
+                    <div>
+                        <small class="text-muted text-uppercase fw-semibold">Recaudación Total del Mes</small>
+                        <h4 class="mb-0 fw-bold text-success">
+                            $ <span th:text="${#numbers.formatDecimal(recaudacionMes, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Pagos -->
+    <div class="card">
+        <div class="table-responsive text-nowrap">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>N° Comprobante</th>
+                        <th>Socio Titular / Familia</th>
+                        <th>Período</th>
+                        <th>Importe</th>
+                        <th>Medio de Pago</th>
+                        <th>Fecha de Cobro</th>
+                        <th>Operador</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                    <tr th:if="${#lists.isEmpty(pagos)}">
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bx bx-receipt fs-1 d-block mb-2"></i>
+                            No hay cobranzas de cuotas registradas en el sistema.
+                        </td>
+                    </tr>
+                    <tr th:each="p : ${pagos}">
+                        <td>
+                            <strong class="text-primary" th:text="${p.numeroComprobante}">REC-202609-ABCD</strong>
+                        </td>
+                        <td>
+                            <strong th:text="${p.socioNombreCompleto}">Nombre Socio</strong>
+                            <div class="small text-muted" th:text="'DNI: ' + ${p.socioDni} + ' | Carnet: ' + ${p.socioNumero}">Carnet</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-label-dark" th:text="${p.periodoFormateado}">09/2026</span>
+                        </td>
+                        <td>
+                            <strong class="fs-6">$ <span th:text="${#numbers.formatDecimal(p.monto, 1, 'POINT', 2, 'COMMA')}">15.000,00</span></strong>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="'bg-label-' + ${p.medioPagoColorBadge}">
+                                <i class="bx me-1" th:classappend="${p.medioPagoIcono}"></i>
+                                <span th:text="${p.medioPagoEtiqueta}">Efectivo</span>
+                            </span>
+                        </td>
+                        <td th:text="${#temporals.format(p.fechaPago, 'dd/MM/yyyy HH:mm')}">01/09/2026 10:00</td>
+                        <td>
+                            <small class="badge bg-label-secondary" th:text="${p.creadoPor != null ? p.creadoPor : 'SISTEMA'}">admin</small>
+                        </td>
+                        <td>
+                            <a th:href="@{'/pagos/comprobante/' + ${p.id}}" class="btn btn-sm btn-outline-primary" title="Imprimir Comprobante">
+                                <i class="bx bx-printer me-1"></i> Recibo
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</html>

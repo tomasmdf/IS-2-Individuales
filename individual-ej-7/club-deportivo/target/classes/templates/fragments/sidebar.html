@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme" th:fragment="sidebar">
+    <div class="app-brand demo">
+        <a th:href="@{/}" class="app-brand-link">
+            <span class="app-brand-logo demo">
+                <i class="bx bxs-trophy text-primary" style="font-size: 2rem;"></i>
+            </span>
+            <span class="app-brand-text demo menu-text fw-bolder ms-2 text-uppercase" style="font-size: 1.15rem; color: #566a7f;">
+                Club Deportivo
+            </span>
+        </a>
+
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+            <i class="bx bx-chevron-left bx-sm align-middle"></i>
+        </a>
+    </div>
+
+    <div class="menu-inner-shadow"></div>
+
+    <ul class="menu-inner py-1">
+        <!-- Dashboard -->
+        <li class="menu-item" th:classappend="${moduloActivo == 'dashboard'} ? 'active' : ''">
+            <a th:href="@{/}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Analytics">Dashboard</div>
+            </a>
+        </li>
+
+        <!-- Módulo Socios y Grupo Familiar -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Gestión Societaria</span>
+        </li>
+        <li class="menu-item" th:classappend="${moduloActivo == 'socios'} ? 'active open' : ''">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-group"></i>
+                <div data-i18n="Socios">Socios y Familias</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item" th:classappend="${moduloActivo == 'socios'} ? 'active' : ''">
+                    <a th:href="@{/socios}" class="menu-link">
+                        <div data-i18n="ListaSocios">Padrón de Socios</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a th:href="@{/socios/nuevo}" class="menu-link">
+                        <div data-i18n="NuevoSocio">Registrar Nuevo Socio</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Módulo Control Perimetral de Acceso -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Control Perimetral</span>
+        </li>
+        <li class="menu-item" th:classappend="${moduloActivo == 'accesos-control' or moduloActivo == 'accesos-historial'} ? 'active open' : ''">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-id-card"></i>
+                <div data-i18n="Accesos">Control de Accesos</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item" th:classappend="${moduloActivo == 'accesos-control'} ? 'active' : ''">
+                    <a th:href="@{/accesos/control}" class="menu-link">
+                        <div data-i18n="PuestoControl">Molinete / Acceso Facial</div>
+                    </a>
+                </li>
+                <li class="menu-item" th:classappend="${moduloActivo == 'accesos-historial'} ? 'active' : ''">
+                    <a th:href="@{/accesos/historial}" class="menu-link">
+                        <div data-i18n="HistorialAccesos">Historial de Movimientos</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Módulo Cobranza y Medios de Pago -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Tesorería y Finanzas</span>
+        </li>
+        <li class="menu-item" th:classappend="${moduloActivo == 'pagos'} ? 'active open' : ''">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-wallet"></i>
+                <div data-i18n="Pagos">Cuotas Familiares</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item" th:classappend="${moduloActivo == 'pagos'} ? 'active' : ''">
+                    <a th:href="@{/pagos}" class="menu-link">
+                        <div data-i18n="ListadoPagos">Historial de Cobranzas</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a th:href="@{/pagos/nuevo}" class="menu-link">
+                        <div data-i18n="NuevoPago">Registrar Pago de Cuota</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</aside>
+</html>

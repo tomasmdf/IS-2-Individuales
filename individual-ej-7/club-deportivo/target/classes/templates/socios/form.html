@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::content})}">
+
+<th:block th:fragment="content">
+    <div class="row">
+        <div class="col-xl-8 col-lg-10 mx-auto">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" th:text="${esEdicion} ? 'Modificar Datos de Socio' : 'Registrar Nuevo Socio'">
+                        Registrar Nuevo Socio
+                    </h5>
+                    <a th:href="@{/socios}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Volver al Padrón
+                    </a>
+                </div>
+
+                <div class="card-body">
+                    <!-- Formulario con soporte para multipart/form-data (Subida de fotos faciales) -->
+                    <form th:action="@{/socios/guardar}"
+                          th:object="${socioForm}"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden" th:field="*{id}" />
+                        <input type="hidden" th:field="*{fotoRostroActual}" />
+
+                        <!-- Tipo de Socio: Titular o Socio Familiar de otro socio -->
+                        <div class="card bg-lighter mb-4 border">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3 text-primary">
+                                    <i class="bx bx-user-check me-1"></i> Categoría de Membresía
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Tipo de Socio <span class="text-danger">*</span></label>
+                                        <select class="form-select" th:field="*{tipoSocio}" id="selectTipoSocio" onchange="actualizarCamposTipoSocio()">
+                                            <option value="TITULAR">Socio Titular (Cabeza del Grupo Familiar)</option>
+                                            <option value="FAMILIAR">Socio Familiar (Dependiente de otro Socio Titular)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Sub-sección visible únicamente cuando es Socio Familiar -->
+                                <div id="seccionFamiliarVinculado" class="mt-3 pt-3 border-top d-none">
+                                    <div class="alert alert-info py-2 mb-3">
+                                        <i class="bx bx-info-circle me-1"></i> Este socio poseerá su propio carnet de socio y registro individual de entradas/salidas, pero su cuota social estará unificada con la del Socio Titular seleccionado.
+                                    </div>
+                                    <div th:if="${#lists.isEmpty(sociosTitulares)}" class="alert alert-warning py-2 mb-3">
+                                        <i class="bx bx-error-circle me-1"></i> <strong>Aviso:</strong> Aún no se han registrado socios titulares activos en el sistema. Registre primero al menos un socio titular para poder vincular dependientes.
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold" for="socioTitularId">Socio Titular Responsable <span class="text-danger">*</span></label>
+                                            <select class="form-select" th:field="*{socioTitularId}" id="socioTitularId">
+                                                <option value="">-- Seleccione el Socio Titular --</option>
+                                                <option th:each="titular : ${sociosTitulares}"
+                                                        th:value="${titular.id}"
+                                                        th:text="${titular.nombreCompleto + ' (DNI: ' + titular.dni + ' - Carnet: ' + titular.numeroSocio + ')'}">
+                                                    GÓMEZ, Juan (DNI: 30111222 - Carnet: SOC-2026-0001)
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold" for="parentesco">Parentesco con el Titular <span class="text-danger">*</span></label>
+                                            <select class="form-select" th:field="*{parentesco}" id="parentesco">
+                                                <option value="">-- Seleccione Parentesco --</option>
+                                                <option th:each="p : ${parentescos}"
+                                                        th:value="${p.name()}"
+                                                        th:text="${p.descripcion}">
+                                                    Cónyuge
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección de Fotografía Facial para Control Biométrico -->
+                        <div class="card bg-lighter mb-4 border">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3 text-primary">
+                                    <i class="bx bx-camera me-1"></i> Fotografía del Rostro (Identificación Biométrica)
+                                </h6>
+                                <p class="small text-muted mb-3">
+                                    Requerimiento: "El sistema guarda además de los datos principales una imagen con el rostro de cada persona."
+                                    Esta imagen se proyectará en la terminal del guardia al registrar ingresos y egresos.
+                                </p>
+                                <div class="d-flex align-items-start align-items-sm-center gap-4">
+                                    <img id="previewRostro"
+                                         th:if="${socioForm.fotoRostroActual != null}"
+                                         th:src="@{'/uploads/rostros/' + ${socioForm.fotoRostroActual}}"
+                                         alt="Vista previa del rostro"
+                                         class="avatar-facial-lg"
+                                         onerror="this.src='/assets/img/avatars/1.png';" />
+                                    <img id="previewRostro"
+                                         th:unless="${socioForm.fotoRostroActual != null}"
+                                         th:src="@{/assets/img/avatars/1.png}"
+                                         alt="Vista previa del rostro"
+                                         class="avatar-facial-lg" />
+
+                                    <div class="button-wrapper">
+                                        <label for="fotoArchivo" class="btn btn-outline-primary me-2 mb-2" tabindex="0">
+                                            <i class="bx bx-upload me-1"></i> Seleccionar Foto del Rostro
+                                            <input type="file"
+                                                   id="fotoArchivo"
+                                                   th:field="*{fotoArchivo}"
+                                                   class="account-file-input"
+                                                   hidden
+                                                   accept="image/png, image/jpeg, image/webp"
+                                                   onchange="previsualizarImagen(this)" />
+                                        </label>
+                                        <p class="text-muted mb-0 small">Formatos válidos: JPG, PNG, WEBP. Tamaño máximo: 5 MB.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Datos Personales Principales -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="dni">DNI / Identificación <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       id="dni"
+                                       class="form-control"
+                                       th:field="*{dni}"
+                                       placeholder="Ej: 32456789"
+                                       th:classappend="${#fields.hasErrors('dni')} ? 'is-invalid' : ''"
+                                       th:readonly="${esEdicion}" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="fechaNacimiento">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                                <input type="date"
+                                       id="fechaNacimiento"
+                                       class="form-control"
+                                       th:field="*{fechaNacimiento}"
+                                       th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'is-invalid' : ''" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="nombre">Nombre(s) <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       id="nombre"
+                                       class="form-control"
+                                       th:field="*{nombre}"
+                                       placeholder="Ej: Juan Carlos"
+                                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="apellido">Apellido(s) <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       id="apellido"
+                                       class="form-control"
+                                       th:field="*{apellido}"
+                                       placeholder="Ej: Rossi"
+                                       th:classappend="${#fields.hasErrors('apellido')} ? 'is-invalid' : ''" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Datos de Contacto -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="email">Correo Electrónico <span class="text-danger">*</span></label>
+                                <input type="email"
+                                       id="email"
+                                       class="form-control"
+                                       th:field="*{email}"
+                                       placeholder="ejemplo@correo.com"
+                                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="telefono">Teléfono de Contacto</label>
+                                <input type="text"
+                                       id="telefono"
+                                       class="form-control"
+                                       th:field="*{telefono}"
+                                       placeholder="+54 11 5555-1234"
+                                       th:classappend="${#fields.hasErrors('telefono')} ? 'is-invalid' : ''" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label" for="direccion">Dirección / Domicilio</label>
+                            <input type="text"
+                                   id="direccion"
+                                   class="form-control"
+                                   th:field="*{direccion}"
+                                   placeholder="Av. Santa Fe 1234, CABA"
+                                   th:classappend="${#fields.hasErrors('direccion')} ? 'is-invalid' : ''" />
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a th:href="@{/socios}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-save me-1"></i> Guardar Socio
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function previsualizarImagen(input) {
+            if (input.files && input.files[0]) {
+                const lector = new FileReader();
+                lector.onload = function(e) {
+                    document.getElementById('previewRostro').src = e.target.result;
+                };
+                lector.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function actualizarCamposTipoSocio() {
+            const select = document.getElementById('selectTipoSocio');
+            const seccion = document.getElementById('seccionFamiliarVinculado');
+            const titularSelect = document.getElementById('socioTitularId');
+            const parentescoSelect = document.getElementById('parentesco');
+
+            if (select && select.value === 'FAMILIAR') {
+                seccion.classList.remove('d-none');
+                titularSelect.required = true;
+                parentescoSelect.required = true;
+            } else if (seccion) {
+                seccion.classList.add('d-none');
+                if (titularSelect) titularSelect.required = false;
+                if (parentescoSelect) parentescoSelect.required = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarCamposTipoSocio();
+        });
+    </script>
+</th:block>
+</html>
