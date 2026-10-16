@@ -1,0 +1,106 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(~{::section}, 'Dashboard')}">
+<body>
+<section>
+
+  <h4 class="fw-bold mb-4">Panel principal</h4>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body d-flex align-items-center">
+          <div class="avatar avatar-lg me-3">
+            <span class="avatar-initial rounded bg-label-primary"><i class='bx bx-devices bx-md'></i></span>
+          </div>
+          <div>
+            <span class="text-muted d-block">Productos activos</span>
+            <h4 class="mb-0" th:text="${totalProductos}">0</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body d-flex align-items-center">
+          <div class="avatar avatar-lg me-3">
+            <span class="avatar-initial rounded bg-label-warning"><i class='bx bx-error bx-md'></i></span>
+          </div>
+          <div>
+            <span class="text-muted d-block">Productos con stock bajo</span>
+            <h4 class="mb-0" th:text="${cantidadStockBajo}">0</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body d-flex align-items-center">
+          <div class="avatar avatar-lg me-3">
+            <span class="avatar-initial rounded bg-label-info"><i class='bx bx-cart bx-md'></i></span>
+          </div>
+          <div>
+            <span class="text-muted d-block">Ordenes de compra pendientes</span>
+            <h4 class="mb-0" th:text="${ordenesPendientes}">0</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <h5 class="card-header">Productos con stock bajo</h5>
+        <div class="table-responsive text-nowrap">
+          <table class="table">
+            <thead>
+              <tr><th>Codigo</th><th>Producto</th><th>Stock</th><th>Minimo</th></tr>
+            </thead>
+            <tbody>
+              <tr th:each="p : ${productosStockBajo}">
+                <td th:text="${p.codigo}"></td>
+                <td th:text="${p.nombre}"></td>
+                <td><span class="badge bg-label-danger" th:text="${p.stock}"></span></td>
+                <td th:text="${p.stockMinimo}"></td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(productosStockBajo)}">
+                <td colspan="4" class="text-center text-muted">Sin alertas de stock</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100">
+        <h5 class="card-header">Ultimas ordenes de compra</h5>
+        <div class="table-responsive text-nowrap">
+          <table class="table">
+            <thead>
+              <tr><th>Numero</th><th>Proveedor</th><th>Estado</th><th>Total</th></tr>
+            </thead>
+            <tbody>
+              <tr th:each="o : ${ultimasOrdenes}">
+                <td><a th:href="@{'/ordenes-compra/' + ${o.id}}" th:text="${o.numero}"></a></td>
+                <td th:text="${o.proveedorNombre}"></td>
+                <td>
+                  <span class="badge"
+                        th:classappend="${o.estado.name() == 'PENDIENTE'} ? 'bg-label-warning' : (${o.estado.name() == 'RECIBIDA'} ? 'bg-label-success' : 'bg-label-secondary')"
+                        th:text="${o.estado}"></span>
+                </td>
+                <td th:text="${'$ ' + #numbers.formatDecimal(o.total, 1, 'POINT', 2, 'COMMA')}"></td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(ultimasOrdenes)}">
+                <td colspan="4" class="text-center text-muted">Todavia no hay ordenes registradas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+</body>
+</html>

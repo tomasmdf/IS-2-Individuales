@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Materias', activo='materias', content=~{::main})}">
+<main>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0"><span class="text-muted fw-light">Académico /</span> Materias</h4>
+        <a th:href="@{/materias/nuevo}" class="btn btn-primary"><i class="bx bx-plus me-1"></i>Nueva materia</a>
+    </div>
+    <div class="card">
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead><tr><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr></thead>
+                <tbody class="table-border-bottom-0">
+                <tr th:each="m : ${materias}">
+                    <td th:text="${m.nombre}">Matemática</td>
+                    <td th:text="${m.descripcion}">-</td>
+                    <td>
+                        <a th:href="@{/materias/{id}/editar(id=${m.id})}" class="btn btn-sm p-1"><i class="bx bx-edit-alt"></i></a>
+                        <form th:action="@{/materias/{id}/eliminar(id=${m.id})}" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar esta materia?');">
+                            <button type="submit" class="btn btn-sm p-1"><i class="bx bx-trash text-danger"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(materias)}"><td colspan="3" class="text-center text-muted py-4">Sin materias cargadas.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</html>

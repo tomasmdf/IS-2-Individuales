@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Aulas', activo='aulas', content=~{::main})}">
+<main>
+    <h4 class="fw-bold mb-4">
+        <span class="text-muted fw-light">Aulas /</span>
+        <span th:text="${aulaRequest.id == null} ? 'Nueva aula' : 'Editar aula'">Formulario</span>
+    </h4>
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card"><div class="card-body">
+                <form th:action="@{/aulas/guardar}" th:object="${aulaRequest}" method="post">
+                    <input type="hidden" th:field="*{id}"/>
+                    <div class="mb-3">
+                        <label class="form-label" for="gradoId">Grado</label>
+                        <select id="gradoId" class="form-select" th:field="*{gradoId}"
+                                th:classappend="${#fields.hasErrors('gradoId')} ? 'is-invalid'">
+                            <option value="">Seleccionar...</option>
+                            <option th:each="g : ${grados}" th:value="${g.id}" th:text="${g.nombre}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{gradoId}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="division">División</label>
+                        <input type="text" id="division" class="form-control" th:field="*{division}"
+                               placeholder="Ej: A" th:classappend="${#fields.hasErrors('division')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{division}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="capacidad">Capacidad</label>
+                        <input type="number" id="capacidad" class="form-control" th:field="*{capacidad}"
+                               placeholder="Ej: 30" th:classappend="${#fields.hasErrors('capacidad')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{capacidad}"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a th:href="@{/aulas}" class="btn btn-outline-secondary">Cancelar</a>
+                </form>
+            </div></div>
+        </div>
+    </div>
+</main>
+</html>

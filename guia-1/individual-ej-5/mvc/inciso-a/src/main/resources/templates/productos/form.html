@@ -1,0 +1,90 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(~{::section}, 'Producto')}">
+<body>
+<section>
+  <h4 class="fw-bold mb-4" th:text="${producto.id} != null ? 'Editar producto' : 'Nuevo producto'"></h4>
+
+  <div class="card">
+    <div class="card-body">
+
+      <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
+      <form th:action="@{/productos/guardar}" th:object="${producto}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Codigo</label>
+            <input type="text" class="form-control" th:field="*{codigo}"
+                   th:classappend="${#fields.hasErrors('codigo')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" th:field="*{nombre}"
+                   th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Categoria</label>
+            <select class="form-select" th:field="*{categoriaId}"
+                    th:classappend="${#fields.hasErrors('categoriaId')} ? 'is-invalid'">
+              <option value="">Seleccione...</option>
+              <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.nombre}"></option>
+            </select>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('categoriaId')}" th:errors="*{categoriaId}"></div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Descripcion</label>
+          <textarea class="form-control" th:field="*{descripcion}" rows="2"></textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Precio de compra</label>
+            <input type="number" step="0.01" min="0.01" class="form-control" th:field="*{precioCompra}"
+                   th:classappend="${#fields.hasErrors('precioCompra')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('precioCompra')}" th:errors="*{precioCompra}"></div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Precio de venta</label>
+            <input type="number" step="0.01" min="0.01" class="form-control" th:field="*{precioVenta}"
+                   th:classappend="${#fields.hasErrors('precioVenta')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('precioVenta')}" th:errors="*{precioVenta}"></div>
+          </div>
+          <div class="col-md-2 mb-3">
+            <label class="form-label">Stock actual</label>
+            <input type="number" min="0" class="form-control" th:field="*{stock}"
+                   th:classappend="${#fields.hasErrors('stock')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"></div>
+          </div>
+          <div class="col-md-2 mb-3">
+            <label class="form-label">Stock minimo</label>
+            <input type="number" min="0" class="form-control" th:field="*{stockMinimo}"
+                   th:classappend="${#fields.hasErrors('stockMinimo')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('stockMinimo')}" th:errors="*{stockMinimo}"></div>
+          </div>
+          <div class="col-md-2 mb-3">
+            <label class="form-label">Estado</label>
+            <div class="form-check form-switch mt-2">
+              <input class="form-check-input" type="checkbox" th:field="*{activo}" />
+              <label class="form-check-label">Activo</label>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-muted small">
+          <i class="bx bx-info-circle"></i>
+          El stock tambien se incrementa automaticamente cuando se recibe una Orden de Compra.
+        </p>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a th:href="@{/productos}" class="btn btn-outline-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</section>
+</body>
+</html>

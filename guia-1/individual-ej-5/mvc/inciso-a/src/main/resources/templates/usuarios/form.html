@@ -1,0 +1,62 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(~{::section}, 'Usuario')}">
+<body>
+<section>
+  <h4 class="fw-bold mb-4" th:text="${usuario.id} != null ? 'Editar usuario' : 'Nuevo usuario'"></h4>
+
+  <div class="card">
+    <div class="card-body">
+
+      <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
+      <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Nombre de usuario</label>
+            <input type="text" class="form-control" th:field="*{username}"
+                   th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Nombre completo</label>
+            <input type="text" class="form-control" th:field="*{nombreCompleto}"
+                   th:classappend="${#fields.hasErrors('nombreCompleto')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">
+              Contraseña
+              <span class="text-muted small" th:if="${usuario.id} != null">(dejar vacio para no modificarla)</span>
+            </label>
+            <input type="password" class="form-control" th:field="*{password}"
+                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" />
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Rol</label>
+            <select class="form-select" th:field="*{rol}">
+              <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Estado</label>
+            <div class="form-check form-switch mt-2">
+              <input class="form-check-input" type="checkbox" th:field="*{activo}" />
+              <label class="form-check-label">Activo</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a th:href="@{/usuarios}" class="btn btn-outline-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</section>
+</body>
+</html>

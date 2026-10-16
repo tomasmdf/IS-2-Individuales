@@ -1,0 +1,87 @@
+<!--
+  ============================================================================
+  auth/login.html  -  Formulario de inicio de sesión.
+  ============================================================================
+  A diferencia del resto de las pantallas, esta NO usa layout/main.html (no
+  tiene sentido mostrar el menú/sidebar antes de haber iniciado sesión). Se
+  basa directamente en la plantilla html/auth-login-basic.html de Sneat.
+
+  El <form> apunta a /login por POST: esa URL la procesa Spring Security
+  directamente (loginProcessingUrl("/login") en SecurityConfig), NO un
+  método de un @Controller. Los parámetros "correo" y "password" coinciden
+  con usernameParameter/passwordParameter configurados allí.
+
+  Thymeleaf agrega automáticamente el token CSRF oculto dentro de cualquier
+  <form th:action="..."> (protección contra Cross-Site Request Forgery,
+  parte de la SEGURIDAD del sistema).
+  ============================================================================
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Ingresar | Sistema de Gestión Escolar</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/assets/img/favicon/favicon.ico}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&amp;display=swap"
+          rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/css/demo.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/vendor/css/pages/page-auth.css}"/>
+    <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+    <script th:src="@{/assets/js/config.js}"></script>
+</head>
+<body>
+<div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+            <div class="card">
+                <div class="card-body">
+                    <div class="app-brand justify-content-center mb-3">
+                        <span class="app-brand-logo demo"><i class="bx bx-buildings bx-lg" style="color:#696cff"></i></span>
+                    </div>
+                    <h4 class="mb-2 text-center">Sistema de Gestión Escolar</h4>
+                    <p class="mb-4 text-center">Ingrese con su correo institucional y contraseña</p>
+
+                    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                        Correo o contraseña incorrectos.
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-success" role="alert">
+                        Sesión cerrada correctamente.
+                    </div>
+
+                    <form th:action="@{/login}" method="post" class="mb-3">
+                        <div class="mb-3">
+                            <label for="correo" class="form-label">Correo</label>
+                            <input type="email" class="form-control" id="correo" name="correo"
+                                   placeholder="nombre.apellido@colegio.local" autofocus required/>
+                        </div>
+                        <div class="mb-3 form-password-toggle">
+                            <label class="form-label" for="password">Contraseña</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" id="password" class="form-control" name="password"
+                                       placeholder="&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;" required/>
+                                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-primary d-grid w-100" type="submit">Ingresar</button>
+                        </div>
+                    </form>
+
+                    <p class="text-center small text-muted">
+                        ¿Olvidó su contraseña? Solicítele al administrador del sistema que la restablezca.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+<script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+<script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+<script th:src="@{/assets/vendor/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Grados', activo='grados', content=~{::main})}">
+<main>
+    <h4 class="fw-bold mb-4">
+        <span class="text-muted fw-light">Grados /</span> <span th:text="${grado.nombre}">1er Año</span>
+    </h4>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Aulas de este grado</h5>
+            <table class="table">
+                <thead><tr><th>División</th><th>Capacidad</th><th>Alumnos</th></tr></thead>
+                <tbody>
+                <tr th:each="a : ${aulas}">
+                    <td th:text="${a.division}">A</td>
+                    <td th:text="${a.capacidad}">30</td>
+                    <td th:text="${a.cantidadAlumnos}">0</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(aulas)}"><td colspan="3" class="text-center text-muted py-3">Este grado todavía no tiene aulas.</td></tr>
+                </tbody>
+            </table>
+            <a th:href="@{/aulas/nuevo}" class="btn btn-sm btn-primary"><i class="bx bx-plus me-1"></i>Agregar aula</a>
+            <a th:href="@{/grados}" class="btn btn-sm btn-outline-secondary">Volver</a>
+        </div>
+    </div>
+</main>
+</html>

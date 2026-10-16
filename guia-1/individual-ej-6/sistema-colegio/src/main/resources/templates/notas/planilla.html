@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Notas', activo='notas', content=~{::main})}">
+<main>
+    <h4 class="fw-bold mb-1"><span class="text-muted fw-light">Notas /</span> <span th:text="${asignacion.nombreMateria}">Matemática</span></h4>
+    <p class="text-muted mb-4" th:text="${asignacion.etiquetaAula}">1er Año "A"</p>
+
+    <!-- Selector de período -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <a th:each="p : ${periodos}"
+               th:href="@{/notas/asignacion/{id}(id=${asignacion.id}, periodo=${p})}"
+               class="btn btn-sm"
+               th:classappend="${p == periodoSeleccionado} ? 'btn-primary' : 'btn-outline-primary'"
+               th:text="${p}">Período</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead><tr><th>Alumno</th><th>Nota (1 a 10)</th><th>Observaciones</th><th>Acción</th></tr></thead>
+                <tbody class="table-border-bottom-0">
+                <tr th:each="al : ${alumnos}">
+                    <!--
+                        Se busca si ya existe una nota cargada para este alumno en el período
+                        seleccionado (con #lists.), para precargar el formulario en modo edición
+                        (patrón UPSERT que resuelve NotaService.guardar en la capa de servicio).
+                    -->
+                    <th:block th:with="notaExistente=${notas.stream().filter(n -> n.alumnoId == al.id).findFirst().orElse(null)}">
+                        <form th:action="@{/notas/guardar}" method="post" class="d-contents">
+                            <input type="hidden" name="asignacionId" th:value="${asignacion.id}"/>
+                            <input type="hidden" name="alumnoId" th:value="${al.id}"/>
+                            <input type="hidden" name="periodo" th:value="${periodoSeleccionado}"/>
+                            <input type="hidden" name="id" th:value="${notaExistente != null ? notaExistente.id : ''}"/>
+                            <td th:text="${al.nombreCompleto()}">Apellido, Nombre</td>
+                            <td style="max-width:120px;">
+                                <input type="number" step="0.01" min="1" max="10" name="valor" class="form-control form-control-sm"
+                                       th:value="${notaExistente != null ? notaExistente.valor : ''}" required/>
+                            </td>
+                            <td>
+                                <input type="text" name="observaciones" class="form-control form-control-sm"
+                                       th:value="${notaExistente != null ? notaExistente.observaciones : ''}" maxlength="500"/>
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-sm btn-primary"><i class="bx bx-save"></i></button>
+                                <button th:if="${notaExistente != null}" type="submit" class="btn btn-sm"
+                                        th:formaction="@{/notas/{id}/eliminar(id=${notaExistente != null ? notaExistente.id : 0}, asignacionId=${asignacion.id})}"
+                                        onclick="return confirm('¿Eliminar esta nota?');">
+                                    <i class="bx bx-trash text-danger"></i>
+                                </button>
+                            </td>
+                        </form>
+                    </th:block>
+                </tr>
+                <tr th:if="${#lists.isEmpty(alumnos)}"><td colspan="4" class="text-center text-muted py-4">Esta aula no tiene alumnos cargados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</html>

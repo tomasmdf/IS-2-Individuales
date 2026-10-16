@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(~{::content})}">
+
+<th:block th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold py-1 mb-0"><span class="text-muted fw-light">Padrón /</span> Socios Titulares</h4>
+            <p class="text-muted mb-0">Gestión de socios titulares y consulta del estado de sus grupos familiares</p>
+        </div>
+        <div>
+            <a th:href="@{/socios/nuevo}" class="btn btn-primary">
+                <i class="bx bx-user-plus me-1"></i> Registrar Nuevo Socio
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtro de Búsqueda -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form th:action="@{/socios}" method="get" class="row g-3 align-items-center">
+                <div class="col-md-9 col-sm-8">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bx bx-search"></i></span>
+                        <input type="text"
+                               name="criterio"
+                               class="form-control"
+                               placeholder="Filtrar por nombre, apellido, DNI o número de socio..."
+                               th:value="${criterioBusqueda}" />
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bx bx-filter-alt me-1"></i> Buscar
+                    </button>
+                    <a th:if="${criterioBusqueda != null and !#strings.isEmpty(criterioBusqueda)}"
+                       th:href="@{/socios}"
+                       class="btn btn-outline-secondary"
+                       title="Limpiar filtro">
+                        <i class="bx bx-x"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Socios -->
+    <div class="card">
+        <div class="table-responsive text-nowrap">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Rostro</th>
+                        <th>Socio / Categoría</th>
+                        <th>DNI / Carnet</th>
+                        <th>Contacto</th>
+                        <th>Familiares</th>
+                        <th>Estado Cuota</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                    <tr th:if="${#lists.isEmpty(socios)}">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bx bx-user-x fs-1 d-block mb-2"></i>
+                            No se encontraron socios registrados con el criterio especificado.
+                        </td>
+                    </tr>
+                    <tr th:each="socio : ${socios}">
+                        <td>
+                            <img th:if="${socio.fotoRostro != null}"
+                                 th:src="@{'/uploads/rostros/' + ${socio.fotoRostro}}"
+                                 alt="Rostro"
+                                 class="avatar-facial"
+                                 onerror="this.src='/assets/img/avatars/1.png';" />
+                            <img th:unless="${socio.fotoRostro != null}"
+                                 th:src="@{/assets/img/avatars/1.png}"
+                                 alt="Rostro"
+                                 class="avatar-facial" />
+                        </td>
+                        <td>
+                            <strong th:text="${socio.nombreCompleto}">Nombre Completo</strong>
+                            <small class="d-block text-muted" th:text="${socio.edad} + ' años'"></small>
+                            <div class="mt-1">
+                                <span th:if="${socio.tipoSocio.name() == 'TITULAR'}" class="badge bg-label-primary">
+                                    <i class="bx bx-crown me-1"></i> Socio Titular
+                                </span>
+                                <span th:if="${socio.tipoSocio.name() == 'FAMILIAR'}" class="badge bg-label-info">
+                                    <i class="bx bx-group me-1"></i> Socio Familiar (<span th:text="${socio.parentescoDescripcion}">Familiar</span>)
+                                </span>
+                            </div>
+                            <div th:if="${socio.tipoSocio.name() == 'FAMILIAR' and socio.socioTitularId != null}" class="small text-muted mt-1">
+                                Titular: <a th:href="@{'/socios/detalle/' + ${socio.socioTitularId}}" class="fw-semibold" th:text="${socio.socioTitularNombreCompleto}">Titular</a>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-label-dark" th:text="${socio.numeroSocio}">SOC-2026-0001</span>
+                            <div class="small text-muted" th:text="'DNI: ' + ${socio.dni}">DNI: 32456789</div>
+                        </td>
+                        <td>
+                            <span class="small" th:text="${socio.email}">email@ejemplo.com</span>
+                            <div class="small text-muted" th:text="${socio.telefono}">+54 11 0000-0000</div>
+                        </td>
+                        <td>
+                            <span th:if="${socio.tipoSocio.name() == 'TITULAR'}" class="badge bg-label-info">
+                                <i class="bx bx-group me-1"></i> <span th:text="${socio.cantidadFamiliares}">0</span>
+                            </span>
+                            <span th:unless="${socio.tipoSocio.name() == 'TITULAR'}" class="text-muted small">
+                                Dependiente
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="'bg-label-' + ${socio.estadoCuota.colorBadge}">
+                                <i class="bx me-1" th:classappend="${socio.estadoCuota.icono}"></i>
+                                <span th:text="${socio.estadoCuota.etiqueta}">Al Día</span>
+                            </span>
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" th:href="@{'/socios/detalle/' + ${socio.id}}">
+                                        <i class="bx bx-id-card me-1 text-primary"></i> Ver Ficha Completa
+                                    </a>
+                                    <a th:if="${socio.tipoSocio.name() == 'TITULAR'}"
+                                       class="dropdown-item" th:href="@{'/socios/nuevo?titularId=' + ${socio.id}}">
+                                        <i class="bx bx-user-plus me-1 text-info"></i> Agregar Socio Familiar
+                                    </a>
+                                    <a th:if="${socio.tipoSocio.name() == 'TITULAR'}"
+                                       class="dropdown-item" th:href="@{'/pagos/nuevo?socioId=' + ${socio.id}}">
+                                        <i class="bx bx-wallet me-1 text-success"></i> Cobrar Cuota Familiar
+                                    </a>
+                                    <a class="dropdown-item" th:href="@{'/socios/editar/' + ${socio.id}}">
+                                        <i class="bx bx-edit-alt me-1 text-warning"></i> Editar Datos
+                                    </a>
+                                    <div class="dropdown-divider" sec:authorize="hasRole('ROLE_ADMIN')"></div>
+                                    <form sec:authorize="hasRole('ROLE_ADMIN')"
+                                          th:action="@{'/socios/eliminar/' + ${socio.id}}"
+                                          method="post"
+                                          onsubmit="return confirm('¿Está seguro de dar de baja a este socio?');">
+                                        <button type="submit" class="dropdown-item text-danger border-0 bg-transparent">
+                                            <i class="bx bx-trash me-1"></i> Dar de Baja
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</html>

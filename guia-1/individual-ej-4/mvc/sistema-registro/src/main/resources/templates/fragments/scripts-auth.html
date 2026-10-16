@@ -1,0 +1,17 @@
+<!--
+=====================================================================================
+FRAGMENTO THYMELEAF "scripts-auth" — scripts JS de cierre de login/registro
+=====================================================================================
+Corresponde exactamente al bloque final <script> de auth-login-basic.html /
+auth-register-basic.html de Sneat (Core JS: jQuery, Popper, Bootstrap,
+perfect-scrollbar, menu.js, y luego main.js).
+=====================================================================================
+-->
+<div th:fragment="scripts">
+    <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+    <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+    <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+    <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+    <script th:src="@{/assets/vendor/js/menu.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+</div>

@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+* {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+}
+
+.index-max div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+}
+
+.index-max label {
+    font-size: 0.9rem;
+}
+
+.index-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+}
+
+.index-input {
+    width: 100%;
+}
+
+#myForm input[type="text"]::placeholder,
+#myForm input[type="email"]::placeholder {
+    color: #999;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+#username, #email, #password {
+    border: none;
+    outline: none;
+    width: 100%;
+}

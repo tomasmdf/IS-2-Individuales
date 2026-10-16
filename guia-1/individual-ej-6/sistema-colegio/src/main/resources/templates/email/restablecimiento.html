@@ -1,0 +1,61 @@
+<!--
+  ============================================================================
+  email/restablecimiento.html  -  Cuerpo del correo enviado cuando el
+  administrador restablece la contraseña de un docente (botón "Restablecer
+  contraseña" en el listado de Docentes). Mismo criterio de estilo inline
+  que email/bienvenida.html.
+  ============================================================================
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/></head>
+<body style="margin:0;padding:0;background-color:#f4f5fb;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5fb;padding:32px 0;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="480" cellpadding="0" cellspacing="0"
+                   style="background-color:#ffffff;border-radius:8px;overflow:hidden;">
+                <tr>
+                    <td style="background-color:#ff9f43;padding:24px 32px;">
+                        <span style="color:#ffffff;font-size:20px;font-weight:bold;">Contraseña restablecida</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:32px;color:#333333;">
+                        <h2 style="margin-top:0;" th:text="'Hola, ' + ${nombre} + '.'">Hola.</h2>
+                        <p>
+                            El administrador de <strong th:text="${nombreColegio}">Colegio</strong> restableció su
+                            contraseña de acceso al Sistema de Gestión Escolar. Sus nuevos datos de ingreso son:
+                        </p>
+                        <table role="presentation" cellpadding="6" style="background-color:#f4f5fb;border-radius:6px;margin:16px 0;">
+                            <tr>
+                                <td style="color:#8592a3;">Usuario (correo)</td>
+                                <td style="font-weight:bold;" th:text="${correo}">correo@colegio.local</td>
+                            </tr>
+                            <tr>
+                                <td style="color:#8592a3;">Contraseña nueva</td>
+                                <td style="font-weight:bold;" th:text="${password}">********</td>
+                            </tr>
+                        </table>
+                        <p>
+                            Por seguridad, le recomendamos ingresar y cambiarla nuevamente desde
+                            <strong>"Mi cuenta &rarr; Cambiar contraseña"</strong>.
+                        </p>
+                        <p style="text-align:center;margin:28px 0;">
+                            <a th:href="${urlIngreso}"
+                               style="background-color:#696cff;color:#ffffff;text-decoration:none;
+                                      padding:12px 28px;border-radius:6px;font-weight:bold;display:inline-block;">
+                                Ingresar al sistema
+                            </a>
+                        </p>
+                        <p style="font-size:12px;color:#8592a3;">
+                            Si usted no solicitó este cambio, comuníquese de inmediato con la administración del colegio.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

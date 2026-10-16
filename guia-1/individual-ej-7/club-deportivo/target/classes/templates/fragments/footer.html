@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<footer class="content-footer footer bg-footer-theme" th:fragment="footer">
+    <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+        <div class="mb-2 mb-md-0">
+            © <span th:text="${#calendars.year(#calendars.createNow())}">2026</span> Club Deportivo - Sistema Integral de Socios, Accesos y Cobranzas.
+        </div>
+        <div>
+            <span class="badge bg-label-primary me-2">Plantilla Sneat Bootstrap 5</span>
+            <span class="badge bg-label-info">Arquitectura MVC + Spring Boot</span>
+        </div>
+    </div>
+</footer>
+</html>

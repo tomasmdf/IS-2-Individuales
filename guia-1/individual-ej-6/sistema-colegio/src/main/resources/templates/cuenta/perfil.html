@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(titulo='Mi cuenta', activo='', content=~{::main})}">
+<main>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Mis datos</h5>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Nombre y apellido</dt>
+                        <dd class="col-sm-8" th:text="${docente.nombre} + ' ' + ${docente.apellido}">-</dd>
+
+                        <dt class="col-sm-4 text-muted">Correo (usuario)</dt>
+                        <dd class="col-sm-8" th:text="${docente.correo}">-</dd>
+
+                        <dt class="col-sm-4 text-muted">Sexo</dt>
+                        <dd class="col-sm-8" th:text="${docente.sexo}">-</dd>
+
+                        <dt class="col-sm-4 text-muted">Fecha de nacimiento</dt>
+                        <dd class="col-sm-8" th:text="${#temporals.format(docente.fechaNacimiento, 'dd/MM/yyyy')}">-</dd>
+
+                        <dt class="col-sm-4 text-muted">Rol</dt>
+                        <dd class="col-sm-8" th:text="${docente.rol}">-</dd>
+                    </dl>
+                    <a th:href="@{/cuenta/cambiar-password}" class="btn btn-primary mt-4">
+                        <i class="bx bx-key me-1"></i>Cambiar mi contraseña
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</html>

@@ -1,5 +1,3 @@
-# Ignora todo por defecto
-/*
 
 # Permite el propio .gitignore
 !.gitignore

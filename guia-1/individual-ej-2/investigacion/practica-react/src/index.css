@@ -1,0 +1,79 @@
+:root {
+    --background-main-color: #1D2127;
+    --background-2nd-color: #252930;
+    --text-color-main: #D1D7E0;
+    --text-color-2nd: #AAAEB6;
+    --accent-color: #6387A9;
+    --delete-color: #A96363;
+}
+
+
+body {
+    background-color: var(--background-2nd-color);
+    color: #f1f1f1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.main-section {
+    width: 50vw;
+    min-height: 100vh;
+    height: max-content;
+    /*background-color: var(--background-main-color);*/
+}
+.header {
+    position: inherit;
+    background-color: #252930d3;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    margin-top: 10px;
+}
+
+h1 {
+    font-size: 40px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: var(--text-color-main);
+}
+p  {
+    font-size: 20px;
+    color: var(--text-color-2nd);
+}
+
+
+.content-section {
+    width: 100%;
+    height: calc(100vh - 70px);
+}
+.task-item {
+    width: 100%;
+    padding: 20px;
+    height: max-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 35px;
+}
+.task-item:hover > .bi-x-circle {
+    opacity: 1;
+}
+.completed {
+    opacity: .2;
+}
+.bi-dash , .bi-check-lg{
+    font-size: 20px;
+    color: var(--accent-color);
+}
+.bi-x-circle {
+    opacity: 0;
+    float: right;
+    font-size: 20px;
+    color: var(--delete-color);
+}
+.task-description {
+    font-size: 18px;
+}

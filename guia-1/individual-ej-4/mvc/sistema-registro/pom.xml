@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ==========================================================================
+     POM.XML - Archivo de configuración de Maven
+    ==========================================================================
+     Aquí se declaran:
+       1) La versión de Spring Boot que se usa como "padre" (spring-boot-starter-parent),
+          la cual ya trae resueltas las versiones compatibles de todas las librerías.
+       2) Las dependencias (librerías) que necesita el proyecto:
+            - spring-boot-starter-web       -> Controladores MVC, servidor Tomcat embebido
+            - spring-boot-starter-thymeleaf -> Motor de plantillas para la VISTA (V del MVC)
+            - spring-boot-starter-data-jpa  -> ORM (Hibernate) para el MODELO (M del MVC)
+            - mysql-connector-j             -> Driver JDBC para conectarse a MySQL
+            - spring-boot-starter-validation-> Validaciones Bean Validation (@NotBlank, @Email, etc.)
+            - lombok                        -> Genera getters/setters/constructores por anotaciones
+            - spring-boot-devtools          -> Recarga automática en desarrollo (opcional)
+       3) El plugin de Spring Boot que permite empaquetar y ejecutar la app con
+          "mvn spring-boot:run" o generar un .jar ejecutable con "mvn package".
+    ==========================================================================
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.4</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.ejercicio</groupId>
+    <artifactId>sistema-registro</artifactId>
+    <version>1.0.0</version>
+    <name>sistema-registro</name>
+    <description>
+        Ejercicio a) - Sistema de registro/login con bloqueo por intentos fallidos.
+        Arquitectura MVC (Modelo - Vista - Controlador) + ORM (JPA/Hibernate) + Thymeleaf + MySQL.
+    </description>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <dependencies>
+        <!-- CAPA CONTROLADOR: Spring MVC + servidor embebido -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- CAPA VISTA: Motor de plantillas Thymeleaf (procesa los .html en /templates) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- CAPA MODELO / ORM: Spring Data JPA (usa Hibernate por debajo) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Driver JDBC para MySQL -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Validaciones de los formularios (Bean Validation / Jakarta Validation) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Para hashear la clave del usuario (BCrypt) sin necesidad de Spring Security completo -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
+        <!-- Lombok: genera getters, setters, constructores, toString, etc. con anotaciones -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Recarga en caliente durante el desarrollo (opcional, no va a producción) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Dependencias para tests -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
